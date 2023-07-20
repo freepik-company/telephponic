@@ -3,3 +3,7 @@
 ### Feat
 
 - Initial version
+
+### Refactor
+
+- set namespace according to company code style
