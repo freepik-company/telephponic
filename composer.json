@@ -1,0 +1,51 @@
+{
+  "name": "muriano/telephponic",
+  "description": "A comprehensive PHP telemetry library enabling efficient collection, analysis, and visualization of your application's performance metrics. Make informed decisions with Telephphonic!",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Muriano\\Telephponic\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "José A. Muriano",
+      "email": "jamuriano@gmail.com"
+    }
+  ],
+  "minimum-stability": "beta",
+  "require": {
+    "php": "^8.0.0",
+    "ext-grpc": "*",
+    "ext-pdo": "*",
+    "ext-memcached": "*",
+    "ext-redis": "*",
+    "open-telemetry/api": "@stable",
+    "open-telemetry/sdk": "@stable",
+    "open-telemetry/transport-grpc": "@stable",
+    "open-telemetry/exporter-otlp": "@stable",
+    "grpc/grpc": "^1.52",
+    "symfony/http-client": "^6.3",
+    "nyholm/psr7": "^1.8",
+    "guzzlehttp/promises": "^2.0",
+    "php-http/httplug": "^2.4",
+    "google/protobuf": "^v3.3.0",
+    "google/cloud-trace": "^1.6",
+    "open-telemetry/exporter-zipkin": "^0.0.17"
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  },
+  "suggest": {
+    "ext-protobuf": "Significant performance improvement for otlp+protobuf exporting",
+    "ext-mbstring": "More performant than the fallback, symfony/polyfill-mbstring",
+    "ext-zlib": "If you want to compress exported data",
+    "ext-ffi": "Fiber-based context storage"
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^6.3"
+  }
+}

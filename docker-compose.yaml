@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.46
+    ports:
+      - "16686:16686"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  zipkin:
+    image: openzipkin/zipkin-gcp:1.0.0
+    environment:
+      - STORAGE_TYPE=stackdriver
+      - GOOGLE_APPLICATION_CREDENTIALS=/application_default_credentials.json
+      - STACKDRIVER_PROJECT_ID=fc-it-cross-sbx-rev1
+    volumes:
+      - /Users/jamuriano/.config/gcloud/application_default_credentials.json:/application_default_credentials.json
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    depends_on:
+      - jaeger
+    entrypoint: [ 'php', '-S', '0.0.0.0:8080', '-t', '/app/examples' ]
+    volumes:
+      - .:/app
+      - /Users/jamuriano/.config/gcloud/application_default_credentials.json:/application_default_credentials.json
+    working_dir: /app/examples
+    ports:
+      - "8080:8080"
