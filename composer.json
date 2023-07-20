@@ -1,11 +1,11 @@
 {
-  "name": "muriano/telephponic",
+  "name": "freepikcompany/telephponic",
   "description": "A comprehensive PHP telemetry library enabling efficient collection, analysis, and visualization of your application's performance metrics. Make informed decisions with Telephphonic!",
   "type": "library",
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Muriano\\Telephponic\\": "src/"
+      "GR\\Telephponic\\": "src/"
     }
   },
   "authors": [

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Muriano\Telephponic\Trace\Builder;
+namespace GR\Telephponic\Trace\Builder;
 
 use Exception;
-use Muriano\Telephponic\Trace\Telephponic;
+use GR\Telephponic\Trace\Telephponic;
 use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;

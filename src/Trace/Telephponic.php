@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-
-namespace Muriano\Telephponic\Trace;
-
+namespace GR\Telephponic\Trace;
 
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\TracerInterface;

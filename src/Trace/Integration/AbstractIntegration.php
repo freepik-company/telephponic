@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Muriano\Telephponic\Trace\Integration;
+namespace GR\Telephponic\Trace\Integration;
 
-use Muriano\Telephponic\Trace\Telephponic;
+use GR\Telephponic\Trace\Telephponic;
 
 abstract class AbstractIntegration implements Integration
 {

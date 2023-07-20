@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Muriano\Telephponic\Trace\Integration;
+namespace GR\Telephponic\Trace\Integration;
 
 class Curl extends AbstractIntegration
 {
