@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace GR\Telephponic\Trace\Builder;
 
 use Exception;
+use GR\Telephponic\Trace\Integration\Curl;
+use GR\Telephponic\Trace\Integration\Grpc;
+use GR\Telephponic\Trace\Integration\Integration;
+use GR\Telephponic\Trace\Integration\Memcached;
+use GR\Telephponic\Trace\Integration\Redis;
 use GR\Telephponic\Trace\Telephponic;
 use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
@@ -42,6 +47,7 @@ class Builder
     private bool $batchMode = false;
     private array $defaultAttributes = [];
     private $registerShutdown = true;
+    private array $integrations = [];
 
     public function __construct(
         private readonly string $appName,
@@ -220,7 +226,8 @@ class Builder
         return new Telephponic(
             $tracer,
             $this->defaultAttributes,
-            $this->registerShutdown
+            $this->registerShutdown,
+            ...$this->integrations,
         );
     }
 
@@ -282,5 +289,32 @@ class Builder
     public function withNeverSampler(): self
     {
         return $this->withSampler(new AlwaysOffSampler());
+    }
+
+    public function withCurlIntegration(): self
+    {
+        return $this->withIntegration(new Curl());
+    }
+
+    public function withIntegration(Integration $integration): self
+    {
+        $this->integrations[] = $integration;
+
+        return $this;
+    }
+
+    public function withGrpcIntegration(): self
+    {
+        return $this->withIntegration(new Grpc());
+    }
+
+    public function withMemcachedIntegration(): self
+    {
+        return $this->withIntegration(new Memcached());
+    }
+
+    public function withRedisIntegration(): self
+    {
+        return $this->withIntegration(new Redis());
     }
 }

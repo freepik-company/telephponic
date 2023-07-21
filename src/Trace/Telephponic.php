@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GR\Telephponic\Trace;
 
+use GR\Telephponic\Trace\Integration\Integration;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
@@ -18,6 +19,7 @@ class Telephponic
     /** @var array<string, SpanInterface> */
     private array $spans = [];
     private array $scopes = [];
+    private array $integrations = [];
     private ScopeInterface $scope;
     private TracerInterface $tracer;
     private SpanInterface $root;
@@ -26,6 +28,7 @@ class Telephponic
         private readonly TracerProviderInterface $tracerProvider,
         private readonly array $defaultAttributes = [],
         private readonly bool $registerShutdown = true,
+        Integration ...$integrations
     ) {
         $this->tracer = $this->tracerProvider->getTracer('telephponic-tracer');
         $rootName = $_SERVER['REQUEST_URI'] ?? $_SERVER['argv'][0] ?? 'unknown';
@@ -38,6 +41,8 @@ class Telephponic
         if ($this->registerShutdown) {
             register_shutdown_function([$this, 'shutdown']);
         }
+
+        $this->addIntegrations(...$integrations);
     }
 
     private function getSpan(string $name): SpanInterface
@@ -74,6 +79,23 @@ class Telephponic
         }
 
         return $attributes;
+    }
+
+    private function addIntegrations(Integration ...$integrations): void
+    {
+        foreach ($integrations as $integration) {
+            $this->addIntegration($integration);
+        }
+    }
+
+    public function addIntegration(Integration $integration): void
+    {
+        if ($this->integrations[$integration::class] ?? false) {
+            return;
+        }
+
+        $integration->load($this);
+        $this->integrations[$integration::class] = true;
     }
 
     public function addEvent(string $name, string $eventName, array $attributes = []): void
@@ -180,4 +202,5 @@ class Telephponic
         $span = $this->getSpan($name);
         $span->setAttribute($key, $value);
     }
+
 }
