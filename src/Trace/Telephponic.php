@@ -27,7 +27,7 @@ class Telephponic
         private readonly array $defaultAttributes = [],
         private readonly bool $registerShutdown = true,
     ) {
-        $this->tracer = $this->tracerProvider->getTracer('telephponic-trace');
+        $this->tracer = $this->tracerProvider->getTracer('telephponic-tracer');
         $rootName = $_SERVER['REQUEST_URI'] ?? $_SERVER['argv'][0] ?? 'unknown';
 
         $root = $this->getSpan($rootName);
@@ -42,7 +42,7 @@ class Telephponic
 
     private function getSpan(string $name): SpanInterface
     {
-        return $this->tracer->spanBuilder($name)->startSpan();
+        return $this->spans[$name] ?? $this->tracer->spanBuilder($name)->startSpan();
     }
 
     private function getRootAttributes(): array
@@ -82,7 +82,7 @@ class Telephponic
         $span->addEvent($eventName, $attributes);
     }
 
-    public function shutdown(): void
+    public function sendTraces(): void
     {
         foreach ($this->spans as $name => $span) {
             $span->setAttribute('autoclosed', 'true');
@@ -98,11 +98,16 @@ class Telephponic
 
     public function end(string $name): void
     {
-        $span = $this->spans[$name];
-        $scope = $this->scopes[$name];
+        $span = $this->spans[$name] ?? null;
+        $scope = $this->scopes[$name] ?? null;
         unset($this->spans[$name], $this->scopes[$name]);
-        $span->end();
-        $scope->detach();
+        $span?->end();
+        $scope?->detach();
+    }
+
+    public function shutdown(): void
+    {
+        $this->sendTraces();
     }
 
     public function addWatcherToMethod(string $class, string $method): void
@@ -127,7 +132,7 @@ class Telephponic
                 $this->start($name);
             },
             function (mixed $object, array $parameters, mixed $returnValue, ?Throwable $exception) use ($name) {
-                $span = $this->spans[$name] ?? $this->getSpan($name);
+                $span = $this->getSpan($name);
                 $span->setAttributes(
                     [
                         'parameters' => $parameters,
@@ -154,12 +159,25 @@ class Telephponic
 
     public function addException(string $name, Throwable $throwable): void
     {
-        $span = $this->spans[$name] ?? $this->getSpan($name);
+        $span = $this->getSpan($name);
         $span->recordException($throwable);
     }
 
     public function addWatcherToFunction(string $function): void
     {
         $this->createHook(null, $function);
+    }
+
+    public function addAttributes(string $name, array $attributes): void
+    {
+        foreach ($attributes as $key => $value) {
+            $this->addAttribute($name, $key, $value);
+        }
+    }
+
+    public function addAttribute(string $name, string $key, mixed $value): void
+    {
+        $span = $this->getSpan($name);
+        $span->setAttribute($key, $value);
     }
 }
