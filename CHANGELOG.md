@@ -1,3 +1,9 @@
+## 0.3.0 (2023-08-25)
+
+### Feat
+
+- **Dockerfile**: add fc-image support
+
 ## 0.2.0 (2023-07-21)
 
 ### Feat
