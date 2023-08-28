@@ -9,6 +9,7 @@ use GR\Telephponic\Trace\Integration\Curl;
 use GR\Telephponic\Trace\Integration\Grpc;
 use GR\Telephponic\Trace\Integration\Integration;
 use GR\Telephponic\Trace\Integration\Memcached;
+use GR\Telephponic\Trace\Integration\PDO;
 use GR\Telephponic\Trace\Integration\Redis;
 use GR\Telephponic\Trace\Telephponic;
 use OpenTelemetry\API\Common\Signal\Signals;
@@ -316,5 +317,10 @@ class Builder
     public function withRedisIntegration(): self
     {
         return $this->withIntegration(new Redis());
+    }
+
+    public function withPDOIntegration(): self
+    {
+        return $this->withIntegration(new PDO());
     }
 }

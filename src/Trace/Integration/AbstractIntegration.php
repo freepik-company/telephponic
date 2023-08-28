@@ -11,13 +11,13 @@ abstract class AbstractIntegration implements Integration
     public function load(Telephponic $tp): void
     {
         foreach ($this->getMethods() as $class => $methods) {
-            foreach ($methods as $method => $options) {
-                $tp->addWatcherToMethod($class, $method);
+            foreach ($methods as $method => $callable) {
+                $tp->addWatcherToMethod($class, $method, $callable);
             }
         }
 
-        foreach ($this->getFunctions() as $function => $options) {
-            $tp->addWatcherToFunction($function);
+        foreach ($this->getFunctions() as $function => $callable) {
+            $tp->addWatcherToFunction($function, $callable);
         }
     }
 

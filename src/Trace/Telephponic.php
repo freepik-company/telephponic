@@ -132,12 +132,12 @@ class Telephponic
         $this->sendTraces();
     }
 
-    public function addWatcherToMethod(string $class, string $method): void
+    public function addWatcherToMethod(string $class, string $method, $closure): void
     {
-        $this->createHook($class, $method);
+        $this->createHook($class, $method, $closure);
     }
 
-    public function createHook(?string $class, string $method): void
+    public function createHook(?string $class, string $method, $closure): void
     {
         if (!extension_loaded('opentelemetry')) {
             throw new RuntimeException('OpenTelemetry extension is not loaded');
@@ -150,8 +150,19 @@ class Telephponic
         hook(
             $class,
             $method,
-            function () use ($name) {
-                $this->start($name);
+            function (
+                mixed $object,
+                array $params,
+                string $class,
+                string $function,
+                ?string $filename,
+                ?int $lineNumber
+            ) use (
+                $name,
+                $closure
+            ) {
+                $parameters = call_user_func($closure, $object, ...$params);
+                $this->start($name, $parameters);
             },
             function (mixed $object, array $parameters, mixed $returnValue, ?Throwable $exception) use ($name) {
                 $span = $this->getSpan($name);
