@@ -17,6 +17,7 @@
   "minimum-stability": "beta",
   "require": {
     "php": "^8.0.0",
+    "ext-curl": "*",
     "ext-grpc": "*",
     "ext-memcached": "*",
     "ext-pdo": "*",
