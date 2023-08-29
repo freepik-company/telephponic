@@ -4,39 +4,36 @@ declare(strict_types=1);
 
 namespace GR\Telephponic\Trace\Integration;
 
-use JsonException;
-
 class Curl extends AbstractIntegration
 {
 
     public function traceCurlInit(
         ?string $url = null,
     ): array {
-        return [
-            'type' => 'curl/open',
-            'curl.url' => $url ?? 'Not set',
-        ];
+        return $this->generateTraceParams('curl/open', [
+            'curl.url' => $this->convertToValue($url),
+        ]);
     }
 
-    public function traceCurlExec(): array
+    public function traceCurlExec($ch): array
     {
-        return [
-            'type' => 'curl/request',
-        ];
-    }
+        $curlInfo = curl_getinfo($ch);
 
-    public function traceCurlClose(): array
-    {
-        return [
-            'type' => 'curl/close',
-        ];
-    }
+        $params = !$curlInfo
+            ? []
+            : array_merge(
+                ...array_map(
+                    static function ($key, $value) {
+                        return [
+                            sprintf('curl.%s', $key) => $value,
+                        ];
+                    },
+                    array_keys($curlInfo),
+                    $curlInfo
+                )
+            );
 
-    public function traceCurlMultiInit(): array
-    {
-        return [
-            'type' => 'curl/open',
-        ];
+        return $this->generateTraceParams('curl/exec', $params);
     }
 
     public function traceCurlSetOpt(
@@ -45,7 +42,7 @@ class Curl extends AbstractIntegration
         mixed $value
     ): array {
         $optionName = $this->getCurlOptName($option);
-        $optionValue = $this->getCurlOptValue($value);
+        $optionValue = $this->convertToValue($value);
 
         return [
             'type' => 'curl/setopt',
@@ -81,7 +78,6 @@ class Curl extends AbstractIntegration
             CURLOPT_FORBID_REUSE => 'CURLOPT_FORBID_REUSE',
             CURLOPT_FRESH_CONNECT => 'CURLOPT_FRESH_CONNECT',
             CURLOPT_FTPAPPEND => 'CURLOPT_FTPAPPEND',
-            CURLOPT_FTPASCII => 'CURLOPT_FTPASCII',
             CURLOPT_FTPLISTONLY => 'CURLOPT_FTPLISTONLY',
             CURLOPT_FTPSSLAUTH => 'CURLOPT_FTPSSLAUTH',
             CURLOPT_FTP_CREATE_MISSING_DIRS => 'CURLOPT_FTP_CREATE_MISSING_DIRS',
@@ -105,7 +101,6 @@ class Curl extends AbstractIntegration
             CURLOPT_MAXREDIRS => 'CURLOPT_MAXREDIRS',
             CURLOPT_MAX_RECV_SPEED_LARGE => 'CURLOPT_MAX_RECV_SPEED_LARGE',
             CURLOPT_MAX_SEND_SPEED_LARGE => 'CURLOPT_MAX_SEND_SPEED_LARGE',
-            CURLOPT_MUTE => 'CURLOPT_MUTE',
             CURLOPT_NETRC => 'CURLOPT_NETRC',
             CURLOPT_NOBODY => 'CURLOPT_NOBODY',
             CURLOPT_NOPROGRESS => 'CURLOPT_NOPROGRESS',
@@ -165,37 +160,6 @@ class Curl extends AbstractIntegration
         };
     }
 
-    private function getCurlOptValue(mixed $value): string
-    {
-        if (is_string($value) || is_numeric($value)) {
-            return (string)$value;
-        }
-
-        if (null === $value) {
-            return 'null';
-        }
-
-        if (is_bool($value)) {
-            return $value
-                ? 'true'
-                : 'false';
-        }
-
-        if (is_resource($value)) {
-            return sprintf("resource %s#%d", get_resource_type($value), (int)$value);
-        }
-
-        if (is_array($value) || is_object($value)) {
-            try {
-                return json_encode($value, JSON_THROW_ON_ERROR);
-            } catch (JsonException) {
-                // Do nothing. Will return 'Unknown value'
-            }
-        }
-
-        return 'Unknown value';
-    }
-
     protected function getMethods(): array
     {
         return [];
@@ -204,10 +168,7 @@ class Curl extends AbstractIntegration
     protected function getFunctions(): array
     {
         return [
-            'curl_init' => [$this, 'traceCurlInit'],
             'curl_exec' => [$this, 'traceCurlExec'],
-            'curl_multi_init' => [$this, 'traceCurlMultiInit'],
-            'curl_multi_exec' => [$this, 'traceCurlExec'],
             'curl_setopt' => [$this, 'traceCurlSetOpt'],
         ];
     }
