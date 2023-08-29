@@ -10,120 +10,76 @@ class Memcached extends AbstractIntegration
     {
         return [
             \Memcached::class => [
-                'add' => [
-                    'type' => 'memcached/add',
-                ],
-                'addByKey' => [
-                    'type' => 'memcached/add',
-                ],
-                'append' => [
-                    'type' => 'memcached/append',
-                ],
-                'appendByKey' => [
-                    'type' => 'memcached/append',
-                ],
-                'cas' => [
-                    'type' => 'memcached/cas',
-                ],
-                'casByKey' => [
-                    'type' => 'memcached/cas',
-                ],
-                'decrement' => [
-                    'type' => 'memcached/decrement',
-                ],
-                'decrementByKey' => [
-                    'type' => 'memcached/decrement',
-                ],
-                'delete' => [
-                    'type' => 'memcached/delete',
-                ],
-                'deleteByKey' => [
-                    'type' => 'memcached/delete',
-                ],
-                'deleteMulti' => [
-                    'type' => 'memcached/delete',
-                ],
-                'deleteMultiByKey' => [
-                    'type' => 'memcached/delete',
-                ],
-                'fetch' => [
-                    'type' => 'memcached/fetch',
-                ],
-                'fetchAll' => [
-                    'type' => 'memcached/fetch',
-                ],
-                'flush' => [
-                    'type' => 'memcached/flush',
-                ],
-                'get' => [
-                    'type' => 'memcached/get',
-                ],
-                'getByKey' => [
-                    'type' => 'memcached/get',
-                ],
-                'getMulti' => [
-                    'type' => 'memcached/get',
-                ],
-                'getMultiByKey' => [
-                    'type' => 'memcached/get',
-                ],
-                'getAllKeys' => [
-                    'type' => 'memcached/get',
-                ],
-                'getDelayed' => [
-                    'type' => 'memcached/get',
-                ],
-                'getDelayedByKey' => [
-                    'type' => 'memcached/get',
-                ],
-                'getOption' => [
-                    'type' => 'memcached/get',
-                ],
-                'getResultCode' => [
-                    'type' => 'memcached/get',
-                ],
-                'getResultMessage' => [
-                    'type' => 'memcached/get',
-                ],
-                'increment' => [
-                    'type' => 'memcached/increment',
-                ],
-                'incrementByKey' => [
-                    'type' => 'memcached/increment',
-                ],
-                'prepend' => [
-                    'type' => 'memcached/prepend',
-                ],
-                'prependByKey' => [
-                    'type' => 'memcached/prepend',
-                ],
-                'replace' => [
-                    'type' => 'memcached/replace',
-                ],
-                'replaceByKey' => [
-                    'type' => 'memcached/replace',
-                ],
-                'set' => [
-                    'type' => 'memcached/set',
-                ],
-                'setByKey' => [
-                    'type' => 'memcached/set',
-                ],
-                'setMulti' => [
-                    'type' => 'memcached/set',
-                ],
-                'setMultiByKey' => [
-                    'type' => 'memcached/set',
-                ],
-                'setOption' => [
-                    'type' => 'memcached/set',
-                ],
-                'touch' => [
-                    'type' => 'memcached/touch',
-                ],
-                'touchByKey' => [
-                    'type' => 'memcached/touch',
-                ],
+                'add' => function (\Memcached $object, string $key, mixed $value, int $expiration) {
+                    return $this->generateTraceParams(
+                        'memcached/add',
+                        [
+                            'memcached.instance' => spl_object_hash($object),
+                            'memcached.key' => $this->convertToValue($key),
+                            'memcached.value' => $this->convertToValue($value),
+                            'memcached.expiration' => $this->convertToValue($expiration),
+                        ]
+                    );
+                },
+                'delete' => function (\Memcached $object, string $key, int $time = 0) {
+                    return $this->generateTraceParams(
+                        'memcached/delete',
+                        [
+                            'memcached.instance' => spl_object_hash($object),
+                            'memcached.key' => $this->convertToValue($key),
+                            'memcached.time' => $this->convertToValue($time),
+                        ]
+                    );
+                },
+                'deleteMulti' => function (\Memcached $object, array $keys, int $time = 0) {
+                    return $this->generateTraceParams(
+                        'memcached/delete',
+                        [
+                            'memcached.instance' => spl_object_hash($object),
+                            'memcached.keys' => $this->convertToValue($keys),
+                            'memcached.time' => $this->convertToValue($time),
+                        ]
+                    );
+                },
+                'get' => function (\Memcached $object, string $key) {
+                    return $this->generateTraceParams(
+                        'memcached/get',
+                        [
+                            'memcached.instance' => spl_object_hash($object),
+                            'memcached.key' => $this->convertToValue($key),
+                        ]
+                    );
+                },
+                'getMulti' => function (\Memcached $object, array $keys) {
+                    return $this->generateTraceParams(
+                        'memcached/get',
+                        [
+                            'memcached.instance' => spl_object_hash($object),
+                            'memcached.keys' => $this->convertToValue($keys),
+                        ]
+                    );
+                },
+                'set' => function (\Memcached $object, string $key, mixed $value, int $expiration) {
+                    return $this->generateTraceParams(
+                        'memcached/set',
+                        [
+                            'memcached.instance' => spl_object_hash($object),
+                            'memcached.key' => $this->convertToValue($key),
+                            'memcached.value' => $this->convertToValue($value),
+                            'memcached.expiration' => $this->convertToValue($expiration),
+                        ]
+                    );
+                },
+                'setMulti' => function (\Memcached $object, array $items, int $expiration) {
+                    return $this->generateTraceParams(
+                        'memcached/set',
+                        [
+                            'memcached.instance' => spl_object_hash($object),
+                            'memcached.items' => $this->convertToValue($items),
+                            'memcached.expiration' => $this->convertToValue($expiration),
+                        ]
+                    );
+                },
             ],
         ];
     }
