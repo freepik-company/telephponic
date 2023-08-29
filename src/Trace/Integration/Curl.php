@@ -7,6 +7,36 @@ namespace GR\Telephponic\Trace\Integration;
 class Curl extends AbstractIntegration
 {
 
+    public function traceCurlInit(
+        string $url
+    ): array {
+        return [
+            'type' => 'curl/open',
+            'curl.url' => $url,
+        ];
+    }
+
+    public function traceCurlExec(): array
+    {
+        return [
+            'type' => 'curl/request',
+        ];
+    }
+
+    public function traceCurlClose(): array
+    {
+        return [
+            'type' => 'curl/close',
+        ];
+    }
+
+    public function traceCurlMultiInit(): array
+    {
+        return [
+            'type' => 'curl/open',
+        ];
+    }
+
     protected function getMethods(): array
     {
         return [];
@@ -15,14 +45,11 @@ class Curl extends AbstractIntegration
     protected function getFunctions(): array
     {
         return [
-            'curl_init' => ['type' => 'curl/open',],
-            'curl_exec' => ['type' => 'curl/request',],
-            'curl_close' => ['type' => 'curl/close',],
-            'curl_multi_init' => ['type' => 'curl/open',],
-            'curl_multi_exec' => ['type' => 'curl/request',],
-            'curl_multi_close' => ['type' => 'curl/close',],
-            'curl_multi_add_handle' => ['type' => 'curl/handle-resources',],
-            'curl_multi_remove_handle' => ['type' => 'curl/handle-resources',],
+            'curl_init' => [$this, 'traceCurlInit'],
+            'curl_exec' => [$this, 'traceCurlExec'],
+            'curl_multi_init' => [$this, 'traceCurlMultiInit'],
+            'curl_multi_exec' => [$this, 'traceCurlExec'],
         ];
     }
+
 }
