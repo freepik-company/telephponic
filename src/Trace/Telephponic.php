@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace GR\Telephponic\Trace;
 
 use GR\Telephponic\Trace\Integration\Integration;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanInterface;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ScopeInterface;
 use RuntimeException;
 use Throwable;
@@ -107,14 +110,14 @@ class Telephponic
     public function sendTraces(): void
     {
         foreach ($this->spans as $name => $span) {
-            $span->setAttribute('autoclosed', 'true');
-            $span->end();
             $scope = $this->scopes[$name];
             $scope->detach();
+            $span->setAttribute('autoclosed', 'true');
+            $span->end();
         }
 
-        $this->root->end();
         $this->scope->detach();
+        $this->root->end();
         $this->tracerProvider->shutdown();
     }
 
@@ -123,8 +126,8 @@ class Telephponic
         $span = $this->spans[$name] ?? null;
         $scope = $this->scopes[$name] ?? null;
         unset($this->spans[$name], $this->scopes[$name]);
-        $span?->end();
         $scope?->detach();
+        $span?->end();
     }
 
     public function shutdown(): void
@@ -150,10 +153,10 @@ class Telephponic
         hook(
             $class,
             $method,
-            pre: function (
+            function (
                 mixed $object,
                 array $params,
-                ?string $class,
+                string $class,
                 string $function,
                 ?string $filename,
                 ?int $lineNumber
@@ -161,23 +164,27 @@ class Telephponic
                 $name,
                 $closure
             ) {
-                if (null !== $object) {
-                    $parameters = array_merge([$object], $params);
-                } else {
-                    $parameters = $params;
-                }
-
-                $parameters = call_user_func($closure, ...$parameters);
-                $this->start($name, $parameters);
+                $parameters = call_user_func($closure, $object, ...$params);
+                $span = $this->tracer->spanBuilder($name)->startSpan();
+                $span->setAttributes($parameters);
+                Context::storage()->attach($span->storeInContext(Context::getCurrent()));
             },
-            post: function (mixed $object, array $parameters, mixed $returnValue, ?Throwable $exception) use ($name) {
-                $span = $this->getSpan($name);
-
-                if ($exception !== null) {
-                    $span->recordException($exception);
-                }
-
-                $this->end($name);
+            function (
+                mixed $object,
+                array $parameters,
+                mixed $returnValue,
+                ?Throwable $exception
+            ) use ($name) {
+                $scope = Context::storage()->scope();
+                $scope?->detach();
+                $span = Span::fromContext($scope->context());
+                $exception && $span->recordException($exception);
+                $span->setStatus(
+                    $exception
+                        ? StatusCode::STATUS_ERROR
+                        : StatusCode::STATUS_OK
+                );
+                $span->end();
             }
         );
     }
