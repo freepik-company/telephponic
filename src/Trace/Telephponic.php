@@ -155,7 +155,7 @@ class Telephponic
             $method,
             function (
                 mixed $object,
-                array $params,
+                ?array $params,
                 ?string $class,
                 ?string $function,
                 ?string $filename,
@@ -164,6 +164,7 @@ class Telephponic
                 $name,
                 $closure
             ) {
+                $params ??= [];
                 $parameters = null === $object
                     ? $params
                     : array_merge([$object], $params);
