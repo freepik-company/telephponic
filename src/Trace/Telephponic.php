@@ -150,10 +150,10 @@ class Telephponic
         hook(
             $class,
             $method,
-            function (
+            pre: function (
                 mixed $object,
                 array $params,
-                string $class,
+                ?string $class,
                 string $function,
                 ?string $filename,
                 ?int $lineNumber
@@ -161,16 +161,17 @@ class Telephponic
                 $name,
                 $closure
             ) {
-                $parameters = call_user_func($closure, $object, ...$params);
+                if (null !== $object) {
+                    $parameters = array_merge([$object], $params);
+                } else {
+                    $parameters = $params;
+                }
+
+                $parameters = call_user_func($closure, ...$parameters);
                 $this->start($name, $parameters);
             },
-            function (mixed $object, array $parameters, mixed $returnValue, ?Throwable $exception) use ($name) {
+            post: function (mixed $object, array $parameters, mixed $returnValue, ?Throwable $exception) use ($name) {
                 $span = $this->getSpan($name);
-                $span->setAttributes(
-                    [
-                        'parameters' => $parameters,
-                    ]
-                );
 
                 if ($exception !== null) {
                     $span->recordException($exception);
