@@ -156,17 +156,19 @@ class Telephponic
             function (
                 mixed $object,
                 array $params,
-                string $class,
-                string $function,
+                ?string $class,
+                ?string $function,
                 ?string $filename,
                 ?int $lineNumber
             ) use (
                 $name,
                 $closure
             ) {
-                $parameters = call_user_func($closure, $object, ...$params);
+                $parameters = null === $object
+                    ? $params
+                    : array_merge([$object], $params);
                 $span = $this->tracer->spanBuilder($name)->startSpan();
-                $span->setAttributes($parameters);
+                $span->setAttributes($closure(...$parameters));
                 Context::storage()->attach($span->storeInContext(Context::getCurrent()));
             },
             function (
