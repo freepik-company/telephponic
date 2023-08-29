@@ -68,7 +68,7 @@ class PDO extends AbstractIntegration
         PDOStatement $statement,
         ?array $params = null
     ): array {
-        $this->generateTraceParams(
+        return $this->generateTraceParams(
             'pdo/query',
             [
                 'pdo.query' => $this->sanitizeQuery($statement->queryString),
