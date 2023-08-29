@@ -23,11 +23,9 @@ class Curl extends AbstractIntegration
             ? []
             : array_merge(
                 ...array_map(
-                    static function ($key, $value) {
-                        return [
-                            sprintf('curl.%s', $key) => $value,
-                        ];
-                    },
+                    fn($key, $value) => [
+                        sprintf('curl.%s', $key) => $this->convertToValue($value),
+                    ],
                     array_keys($curlInfo),
                     $curlInfo
                 )
@@ -41,14 +39,11 @@ class Curl extends AbstractIntegration
         int $option,
         mixed $value
     ): array {
-        $optionName = $this->getCurlOptName($option);
-        $optionValue = $this->convertToValue($value);
-
         return [
             'type' => 'curl/setopt',
             'curl.handler' => sprintf("resource curl#%d", (int)$handler),
-            'curl.option' => $optionName,
-            'curl.value' => $optionValue,
+            'curl.option' => $this->getCurlOptName($option),
+            'curl.value' => $this->convertToValue($value),
         ];
     }
 
