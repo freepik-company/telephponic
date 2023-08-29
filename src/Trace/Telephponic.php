@@ -196,9 +196,9 @@ class Telephponic
         $span->recordException($throwable);
     }
 
-    public function addWatcherToFunction(string $function): void
+    public function addWatcherToFunction(string $function, $closure): void
     {
-        $this->createHook(null, $function);
+        $this->createHook(null, $function, $closure);
     }
 
     public function addAttributes(string $name, array $attributes): void
