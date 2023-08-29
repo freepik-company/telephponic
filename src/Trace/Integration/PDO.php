@@ -18,12 +18,14 @@ class PDO extends AbstractIntegration
         ?string $password = null,
         array $options = []
     ): array {
-        return [
-            'type' => 'pdo/connection',
-            'pdo.dsn' => $dsn,
-            'pdo.username' => $username,
-            'pdo.options' => json_encode($options, JSON_THROW_ON_ERROR),
-        ];
+        return $this->generateTraceParams(
+            'pdo/connection',
+            [
+                'pdo.dsn' => $this->convertToValue($dsn),
+                'pdo.username' => $this->convertToValue($username),
+                'pdo.options' => $this->convertToValue($options),
+            ]
+        );
     }
 
     public function tracePdoQuery(
@@ -31,29 +33,48 @@ class PDO extends AbstractIntegration
         string $query,
         ?array $params = null
     ): array {
-        return [
-            'type' => 'pdo/query',
-            'pdo.query' => $query,
-            'pdo.params' => json_encode($params, JSON_THROW_ON_ERROR),
-        ];
+        return $this->generateTraceParams(
+            'pdo/query',
+            [
+                'pdo.query' => $this->sanitizeQuery($query),
+                'pdo.params' => $this->convertToValue($params),
+            ]
+        );
+    }
+
+    private function sanitizeQuery(string $query): string
+    {
+        return $this->convertToValue(
+            str_replace(
+                "`",
+                '',
+                $query
+            )
+        );
     }
 
     public function tracePdoCommit(TargetPDO $pdo): array
     {
-        return [
-            'type' => 'pdo/commit',
-        ];
+        return $this->generateTraceParams(
+            'pdo/commit',
+            [
+                'pdo.dsn' => $this->convertToValue($pdo->getAttribute(TargetPDO::ATTR_CONNECTION_STATUS)),
+                'pdo.username' => $this->convertToValue($pdo->getAttribute(TargetPDO::ATTR_DRIVER_NAME)),
+            ]
+        );
     }
 
     public function tracePdoStatementQuery(
         PDOStatement $statement,
         ?array $params = null
     ): array {
-        return [
-            'type' => 'pdo/query',
-            'pdo.query' => $statement->queryString,
-            'pdo.params' => json_encode($params, JSON_THROW_ON_ERROR),
-        ];
+        $this->generateTraceParams(
+            'pdo/query',
+            [
+                'pdo.query' => $this->sanitizeQuery($statement->queryString),
+                'pdo.params' => $this->convertToValue($params),
+            ]
+        );
     }
 
     protected function getMethods(): array
