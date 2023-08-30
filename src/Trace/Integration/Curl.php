@@ -7,9 +7,15 @@ namespace GR\Telephponic\Trace\Integration;
 class Curl extends AbstractIntegration
 {
 
-    public function traceCurlInit(
-        ?string $url = null,
-    ): array {
+    public function __construct(
+        private readonly bool $traceCurlInit = false,
+        private readonly bool $traceCurlExec = false,
+        private readonly bool $traceCurlSetOpt = false
+    ) {
+    }
+
+    public function traceCurlInit(?string $url): array
+    {
         return $this->generateTraceParams('curl/open', [
             'curl.url' => $this->convertToValue($url),
         ]);
@@ -18,6 +24,8 @@ class Curl extends AbstractIntegration
     public function traceCurlExec($ch): array
     {
         $curlInfo = curl_getinfo($ch);
+        $curlInfo['instance'] = 'curl handler #' . (int)$ch;
+        $curlInfo['url'] = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 
         $params = !$curlInfo
             ? []
@@ -162,10 +170,21 @@ class Curl extends AbstractIntegration
 
     protected function getFunctions(): array
     {
-        return [
-            'curl_exec' => [$this, 'traceCurlExec'],
-            'curl_setopt' => [$this, 'traceCurlSetOpt'],
-        ];
+        $functions = [];
+
+        if ($this->traceCurlInit) {
+            $functions['curl_init'] = [$this, 'traceCurlInit'];
+        }
+
+        if ($this->traceCurlExec) {
+            $functions['curl_exec'] = [$this, 'traceCurlExec'];
+        }
+
+        if ($this->traceCurlSetOpt) {
+            $functions['curl_setopt'] = [$this, 'traceCurlSetOpt'];
+        }
+
+        return $functions;
     }
 
 }
