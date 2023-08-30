@@ -292,9 +292,18 @@ class Builder
         return $this->withSampler(new AlwaysOffSampler());
     }
 
-    public function withCurlIntegration(): self
-    {
-        return $this->withIntegration(new Curl());
+    public function withCurlIntegration(
+        bool $traceCurlInit = false,
+        bool $traceCurlExec = false,
+        bool $traceCurlSetOpt = false
+    ): self {
+        return $this->withIntegration(
+            new Curl(
+                $traceCurlInit,
+                $traceCurlExec,
+                $traceCurlSetOpt
+            )
+        );
     }
 
     public function withIntegration(Integration $integration): self
