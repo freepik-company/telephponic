@@ -9,6 +9,7 @@ use GR\Telephponic\Trace\Integration\Curl;
 use GR\Telephponic\Trace\Integration\Grpc;
 use GR\Telephponic\Trace\Integration\Integration;
 use GR\Telephponic\Trace\Integration\Memcached;
+use GR\Telephponic\Trace\Integration\PDO;
 use GR\Telephponic\Trace\Integration\Redis;
 use GR\Telephponic\Trace\Telephponic;
 use OpenTelemetry\API\Common\Signal\Signals;
@@ -231,19 +232,27 @@ class Builder
         );
     }
 
-    public function withDefaultResource(): self
+    /**
+     * @param bool $enableAutoDiscover If true, Telephponic will add to all spans info retrieve from environment and server.
+     */
+    public function withDefaultResource(bool $enableAutoDiscover = false): self
     {
-        return $this->withResourceInfo(
-            ResourceInfoFactory::merge(
-                ResourceInfo::create(
-                    Attributes::create([
-                        ResourceAttributes::SERVICE_NAMESPACE => $this->namespace ?? $this->appName,
-                        ResourceAttributes::SERVICE_NAME => $this->appName,
-                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->environment,
-                    ])
-                ),
+        $resourceInfo = ResourceInfo::create(
+            Attributes::create([
+                ResourceAttributes::SERVICE_NAMESPACE => $this->namespace ?? $this->appName,
+                ResourceAttributes::SERVICE_NAME => $this->appName,
+                ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->environment,
+            ])
+        );
+        if ($enableAutoDiscover) {
+            $resourceInfo = ResourceInfoFactory::merge(
+                $resourceInfo,
                 ResourceInfoFactory::defaultResource(),
-            )
+            );
+        }
+
+        return $this->withResourceInfo(
+            $resourceInfo
         );
     }
 
@@ -291,9 +300,18 @@ class Builder
         return $this->withSampler(new AlwaysOffSampler());
     }
 
-    public function withCurlIntegration(): self
-    {
-        return $this->withIntegration(new Curl());
+    public function withCurlIntegration(
+        bool $traceCurlInit = false,
+        bool $traceCurlExec = false,
+        bool $traceCurlSetOpt = false
+    ): self {
+        return $this->withIntegration(
+            new Curl(
+                $traceCurlInit,
+                $traceCurlExec,
+                $traceCurlSetOpt
+            )
+        );
     }
 
     public function withIntegration(Integration $integration): self
@@ -308,13 +326,64 @@ class Builder
         return $this->withIntegration(new Grpc());
     }
 
-    public function withMemcachedIntegration(): self
-    {
-        return $this->withIntegration(new Memcached());
+    public function withMemcachedIntegration(
+        bool $traceAdd = false,
+        bool $traceDelete = false,
+        bool $traceDeleteMulti = false,
+        bool $traceGet = false,
+        bool $traceGetMulti = false,
+        bool $traceSet = false,
+        bool $traceSetMulti = false,
+    ): self {
+        return $this->withIntegration(
+            new Memcached(
+                $traceAdd,
+                $traceDelete,
+                $traceDeleteMulti,
+                $traceGet,
+                $traceGetMulti,
+                $traceSet,
+                $traceSetMulti,
+            )
+        );
     }
 
-    public function withRedisIntegration(): self
+    public function withRedisIntegration(
+        bool $traceConnect = false,
+        bool $traceOpen = false,
+        bool $tracePconnect = false,
+        bool $tracePopen = false,
+        bool $traceClose = false,
+        bool $tracePing = false,
+        bool $traceEcho = false,
+        bool $traceGet = false,
+        bool $traceSet = false,
+        bool $traceDel = false,
+        bool $traceDelete = false,
+        bool $traceUnlink = false,
+        bool $traceExists = false,
+    ): self {
+        return $this->withIntegration(
+            new Redis(
+                $traceConnect,
+                $traceOpen,
+                $tracePconnect,
+                $tracePopen,
+                $traceClose,
+                $tracePing,
+                $traceEcho,
+                $traceGet,
+                $traceSet,
+                $traceDel,
+                $traceDelete,
+                $traceUnlink,
+                $traceExists,
+            )
+        );
+    }
+
+    public function withPDOIntegration(): self
     {
-        return $this->withIntegration(new Redis());
+        return $this->withIntegration(new PDO());
     }
 }

@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace GR\Telephponic\Trace;
 
 use GR\Telephponic\Trace\Integration\Integration;
+use Illuminate\Support\Facades\Log;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanInterface;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ScopeInterface;
 use RuntimeException;
 use Throwable;
@@ -107,14 +111,14 @@ class Telephponic
     public function sendTraces(): void
     {
         foreach ($this->spans as $name => $span) {
-            $span->setAttribute('autoclosed', 'true');
-            $span->end();
             $scope = $this->scopes[$name];
             $scope->detach();
+            $span->setAttribute('autoclosed', 'true');
+            $span->end();
         }
 
-        $this->root->end();
         $this->scope->detach();
+        $this->root->end();
         $this->tracerProvider->shutdown();
     }
 
@@ -123,8 +127,8 @@ class Telephponic
         $span = $this->spans[$name] ?? null;
         $scope = $this->scopes[$name] ?? null;
         unset($this->spans[$name], $this->scopes[$name]);
-        $span?->end();
         $scope?->detach();
+        $span?->end();
     }
 
     public function shutdown(): void
@@ -132,40 +136,67 @@ class Telephponic
         $this->sendTraces();
     }
 
-    public function addWatcherToMethod(string $class, string $method): void
+    public function addWatcherToMethod(string $class, string $method, $closure): void
     {
-        $this->createHook($class, $method);
+        $this->createHook($class, $method, $closure);
     }
 
-    public function createHook(?string $class, string $method): void
+    public function createHook(?string $class, string $method, $closure): void
     {
         if (!extension_loaded('opentelemetry')) {
             throw new RuntimeException('OpenTelemetry extension is not loaded');
         }
 
-        $name = (null !== $class)
-            ? $class . '::' . $method
-            : $method;
-
         hook(
             $class,
             $method,
-            function () use ($name) {
-                $this->start($name);
+            pre: function (
+                mixed $object,
+                ?array $params,
+                ?string $class,
+                ?string $function,
+                ?string $filename,
+                ?int $lineNumber
+            ) use (
+                $closure
+            ) {
+                $name = null !== $class
+                    ? $class . '::' . $function
+                    : $function;
+
+                $params ??= [];
+                $parameters = null === $object
+                    ? $params
+                    : array_merge([$object], $params);
+
+                $span = $this->tracer->spanBuilder($name)->startSpan();
+                $span->setAttributes($closure(...$parameters));
+                Context::storage()->attach($span->storeInContext(Context::getCurrent()));
             },
-            function (mixed $object, array $parameters, mixed $returnValue, ?Throwable $exception) use ($name) {
-                $span = $this->getSpan($name);
-                $span->setAttributes(
-                    [
-                        'parameters' => $parameters,
-                    ]
+            post: function (
+                mixed $object,
+                ?array $params,
+                mixed $returnValue,
+                ?Throwable $exception
+            ) use (
+                $closure
+            ) {
+                $params ??= [];
+                $parameters = null === $object
+                    ? $params
+                    : array_merge([$object], $params);
+
+                $scope = Context::storage()->scope();
+                $scope?->detach();
+                $span = Span::fromContext($scope->context());
+                $span->setAttributes($closure(...$parameters));
+                $exception && $span->recordException($exception);
+                $span->setStatus(
+                    $exception
+                        ? StatusCode::STATUS_ERROR
+                        : StatusCode::STATUS_OK
                 );
-
-                if ($exception !== null) {
-                    $span->recordException($exception);
-                }
-
-                $this->end($name);
+                $span->end();
             }
         );
     }
@@ -185,9 +216,9 @@ class Telephponic
         $span->recordException($throwable);
     }
 
-    public function addWatcherToFunction(string $function): void
+    public function addWatcherToFunction(string $function, $closure): void
     {
-        $this->createHook(null, $function);
+        $this->createHook(null, $function, $closure);
     }
 
     public function addAttributes(string $name, array $attributes): void
