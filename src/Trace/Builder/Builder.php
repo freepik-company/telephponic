@@ -232,19 +232,27 @@ class Builder
         );
     }
 
-    public function withDefaultResource(): self
+    /**
+     * @param bool $enableAutoDiscover If true, Telephponic will add to all spans info retrieve from environment and server.
+     */
+    public function withDefaultResource(bool $enableAutoDiscover = false): self
     {
-        return $this->withResourceInfo(
-            ResourceInfoFactory::merge(
-                ResourceInfo::create(
-                    Attributes::create([
-                        ResourceAttributes::SERVICE_NAMESPACE => $this->namespace ?? $this->appName,
-                        ResourceAttributes::SERVICE_NAME => $this->appName,
-                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->environment,
-                    ])
-                ),
+        $resourceInfo = ResourceInfo::create(
+            Attributes::create([
+                ResourceAttributes::SERVICE_NAMESPACE => $this->namespace ?? $this->appName,
+                ResourceAttributes::SERVICE_NAME => $this->appName,
+                ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->environment,
+            ])
+        );
+        if ($enableAutoDiscover) {
+            $resourceInfo = ResourceInfoFactory::merge(
+                $resourceInfo,
                 ResourceInfoFactory::defaultResource(),
-            )
+            );
+        }
+
+        return $this->withResourceInfo(
+            $resourceInfo
         );
     }
 
