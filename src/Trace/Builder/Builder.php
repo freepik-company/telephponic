@@ -326,9 +326,26 @@ class Builder
         return $this->withIntegration(new Grpc());
     }
 
-    public function withMemcachedIntegration(): self
-    {
-        return $this->withIntegration(new Memcached());
+    public function withMemcachedIntegration(
+        bool $traceAdd = false,
+        bool $traceDelete = false,
+        bool $traceDeleteMulti = false,
+        bool $traceGet = false,
+        bool $traceGetMulti = false,
+        bool $traceSet = false,
+        bool $traceSetMulti = false,
+    ): self {
+        return $this->withIntegration(
+            new Memcached(
+                $traceAdd,
+                $traceDelete,
+                $traceDeleteMulti,
+                $traceGet,
+                $traceGetMulti,
+                $traceSet,
+                $traceSetMulti,
+            )
+        );
     }
 
     public function withRedisIntegration(
