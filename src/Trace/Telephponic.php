@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GR\Telephponic\Trace;
 
 use GR\Telephponic\Trace\Integration\Integration;
+use Illuminate\Support\Facades\Log;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\StatusCode;
@@ -146,14 +147,10 @@ class Telephponic
             throw new RuntimeException('OpenTelemetry extension is not loaded');
         }
 
-        $name = (null !== $class)
-            ? $class . '::' . $method
-            : $method;
-
         hook(
             $class,
             $method,
-            function (
+            pre: function (
                 mixed $object,
                 ?array $params,
                 ?string $class,
@@ -161,26 +158,38 @@ class Telephponic
                 ?string $filename,
                 ?int $lineNumber
             ) use (
-                $name,
+                $closure
+            ) {
+                $name = null !== $class
+                    ? $class . '::' . $function
+                    : $function;
+
+                $params ??= [];
+                $parameters = null === $object
+                    ? $params
+                    : array_merge([$object], $params);
+
+                $span = $this->tracer->spanBuilder($name)->startSpan();
+                $span->setAttributes($closure(...$parameters));
+                Context::storage()->attach($span->storeInContext(Context::getCurrent()));
+            },
+            post: function (
+                mixed $object,
+                ?array $params,
+                mixed $returnValue,
+                ?Throwable $exception
+            ) use (
                 $closure
             ) {
                 $params ??= [];
                 $parameters = null === $object
                     ? $params
                     : array_merge([$object], $params);
-                $span = $this->tracer->spanBuilder($name)->startSpan();
-                $span->setAttributes($closure(...$parameters));
-                Context::storage()->attach($span->storeInContext(Context::getCurrent()));
-            },
-            function (
-                mixed $object,
-                array $parameters,
-                mixed $returnValue,
-                ?Throwable $exception
-            ) use ($name) {
+
                 $scope = Context::storage()->scope();
                 $scope?->detach();
                 $span = Span::fromContext($scope->context());
+                $span->setAttributes($closure(...$parameters));
                 $exception && $span->recordException($exception);
                 $span->setStatus(
                     $exception
