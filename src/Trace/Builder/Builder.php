@@ -323,9 +323,38 @@ class Builder
         return $this->withIntegration(new Memcached());
     }
 
-    public function withRedisIntegration(): self
-    {
-        return $this->withIntegration(new Redis());
+    public function withRedisIntegration(
+        bool $traceConnect = false,
+        bool $traceOpen = false,
+        bool $tracePconnect = false,
+        bool $tracePopen = false,
+        bool $traceClose = false,
+        bool $tracePing = false,
+        bool $traceEcho = false,
+        bool $traceGet = false,
+        bool $traceSet = false,
+        bool $traceDel = false,
+        bool $traceDelete = false,
+        bool $traceUnlink = false,
+        bool $traceExists = false,
+    ): self {
+        return $this->withIntegration(
+            new Redis(
+                $traceConnect,
+                $traceOpen,
+                $tracePconnect,
+                $tracePopen,
+                $traceClose,
+                $tracePing,
+                $traceEcho,
+                $traceGet,
+                $traceSet,
+                $traceDel,
+                $traceDelete,
+                $traceUnlink,
+                $traceExists,
+            )
+        );
     }
 
     public function withPDOIntegration(): self
