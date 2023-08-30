@@ -1,3 +1,13 @@
+## 0.4.0 (2023-08-30)
+
+### BREAKING CHANGE
+
+- PHP min version is now 8.1
+
+### Feat
+
+- improve integration tracing info
+
 ## 0.3.0 (2023-08-25)
 
 ### Feat
