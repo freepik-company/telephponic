@@ -1,3 +1,9 @@
+## 1.0.0 (2023-08-30)
+
+### Refactor
+
+- new major version
+
 ## 0.4.0 (2023-08-30)
 
 ### BREAKING CHANGE
