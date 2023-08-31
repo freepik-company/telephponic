@@ -1,3 +1,9 @@
+## 1.1.0 (2023-08-31)
+
+### Feat
+
+- **VT-160**: improve probability sampling configuration (#2)
+
 ## 1.0.0 (2023-08-30)
 
 ### Refactor
