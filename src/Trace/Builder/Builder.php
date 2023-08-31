@@ -12,6 +12,7 @@ use GR\Telephponic\Trace\Integration\Memcached;
 use GR\Telephponic\Trace\Integration\PDO;
 use GR\Telephponic\Trace\Integration\Redis;
 use GR\Telephponic\Trace\Telephponic;
+use InvalidArgumentException;
 use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -29,6 +30,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
@@ -292,7 +294,13 @@ class Builder
 
     public function withProbabilitySampler(float $probability): self
     {
-        return $this->withSampler(new TraceIdRatioBasedSampler($probability));
+        if ($probability < 0 || $probability > 1) {
+            throw new InvalidArgumentException(
+                sprintf('$probability must be between 0 and 1. You passed %s.', $probability)
+            );
+        }
+
+        return $this->withSampler(new ParentBased(new TraceIdRatioBasedSampler($probability)));
     }
 
     public function withNeverSampler(): self
