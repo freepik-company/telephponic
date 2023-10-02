@@ -170,9 +170,7 @@ class Telephponic
                     ? $params
                     : array_merge([$object], $params);
 
-                $span = $this->tracer->spanBuilder($name)->startSpan();
-                $span->setAttributes($closure(...$parameters));
-                Context::storage()->attach($span->storeInContext(Context::getCurrent()));
+                $this->start($name, $closure(...$parameters));
             },
             post: function (
                 mixed $object,
@@ -187,22 +185,19 @@ class Telephponic
                     ? $params
                     : array_merge([$object], $params);
 
-                $scope = $this->getScope();
+                $span = $this->getSpan();
 
-                if (null === $scope) {
-                    return;
-                }
-
-                $span = Span::fromContext($scope->context());
                 $span->setAttributes($closure(...$parameters));
+
                 $exception && $span->recordException($exception);
+
                 $span->setStatus(
                     $exception
                         ? StatusCode::STATUS_ERROR
                         : StatusCode::STATUS_OK
                 );
-                $span->end();
-                $scope?->detach();
+
+                $this->end();
             }
         );
     }
