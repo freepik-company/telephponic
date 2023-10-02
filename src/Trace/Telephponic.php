@@ -99,6 +99,9 @@ class Telephponic
     public function addEvent(string $name, string $eventName, array $attributes = []): void
     {
         $scope = $this->getScope();
+        if (null === $scope) {
+            return;
+        }
         $span = Span::fromContext($scope->context());
         $span->addEvent($eventName, $attributes);
     }
