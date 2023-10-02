@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GR\Telephponic\Trace;
 
 use GR\Telephponic\Trace\Integration\Integration;
-use Illuminate\Support\Facades\Log;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\StatusCode;
@@ -96,7 +95,7 @@ class Telephponic
         $this->integrations[$integration::class] = true;
     }
 
-    public function addEvent(string $name, string $eventName, array $attributes = []): void
+    public function addEvent(string $eventName, array $attributes = []): void
     {
         $scope = $this->getScope();
         if (null === $scope) {
@@ -126,7 +125,7 @@ class Telephponic
         $this->sendTraces();
     }
 
-    public function end(string $name): void
+    public function end(): void
     {
         $scope = $this->getScope();
         $this->getSpan()->end();
@@ -208,7 +207,7 @@ class Telephponic
         );
     }
 
-    public function addException(string $name, Throwable $throwable): void
+    public function addException(Throwable $throwable): void
     {
         $this->getSpan()->recordException($throwable);
     }
@@ -218,17 +217,17 @@ class Telephponic
         $this->createHook(null, $function, $closure);
     }
 
-    public function addAttributes(string $name, array $attributes): void
+    public function addAttribute(string $key, mixed $value): void
     {
-        foreach ($attributes as $key => $value) {
-            $this->addAttribute($name, $key, $value);
-        }
+        $this->addAttributes([$key => $value]);
     }
 
-    public function addAttribute(string $name, string $key, mixed $value): void
+    public function addAttributes(array $attributes): void
     {
         $span = $this->getSpan();
-        $span->setAttribute($key, $value);
+        foreach ($attributes as $key => $value) {
+            $span->setAttribute($key, $value);
+        }
     }
 
 }

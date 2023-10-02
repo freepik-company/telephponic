@@ -32,12 +32,13 @@ $tracer->addWatcherToFunction('sleep', static function (int $time): array {
 });
 
 $tracer->start('search-engine');
-$tracer->addEvent('search-engine', 'search-engine-started');
+$tracer->addEvent('search-engine-started', ['search-engine' => 'started']);
 sleep(1);
 $tracer->start('search-engine-child');
 sleep(2);
-$tracer->end('search-engine-child');
-$tracer->end('search-engine');
+$tracer->addException(new RuntimeException('test exception'));
+$tracer->end();
+$tracer->end();
 
 $tracer->shutdown();
 
