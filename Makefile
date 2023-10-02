@@ -30,5 +30,11 @@ composer-require-dev: ## Require composer dev dependencies
 composer-why: ## Show why a package is installed
 	@docker run --rm --user "${UID}":"${GID}" -v "${PWD}":/app -v /Users/jamuriano/personal-workspace/opentelemetry-php-cloud-trace-exporter:/dependency -w /app dev-telephonic:dev composer why $(filter-out $@,$(MAKECMDGOALS))
 
-run-example: ## Run the project
-	@docker compose exec app php $(filter-out $@,$(MAKECMDGOALS))
+run-example: up ## Run the project
+	@docker compose exec app php $(filter-out $@,$(MAKECMDGOALS)); $(MAKE) down
+
+up: ## Start the project
+	@docker compose up -d
+
+down: ## Stop the project
+	@docker compose down
