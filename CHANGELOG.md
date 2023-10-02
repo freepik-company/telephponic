@@ -1,3 +1,9 @@
+## 1.2.0 (2023-09-27)
+
+### Feat
+
+- **GuzzlePromises**: downgrade to ^1.0 vesion of Promises
+
 ## 1.1.0 (2023-08-31)
 
 ### Feat
