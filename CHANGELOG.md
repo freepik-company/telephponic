@@ -1,8 +1,14 @@
+## 2.0.0 (2023-10-03)
+
+### Feat
+
+- avoid spans and context to be detached twice
+
 ## 1.2.0 (2023-09-27)
 
 ### Feat
 
-- **GuzzlePromises**: downgrade to ^1.0 vesion of Promises
+- **GuzzlePromises**: downgrade to ^1.0 version of Promises
 
 ## 1.1.0 (2023-08-31)
 
