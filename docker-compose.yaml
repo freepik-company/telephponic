@@ -15,7 +15,7 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=/application_default_credentials.json
       - STACKDRIVER_PROJECT_ID=fc-it-cross-sbx-rev1
     volumes:
-      - /Users/jamuriano/.config/gcloud/application_default_credentials.json:/application_default_credentials.json
+      - ${HOME}/.config/gcloud/application_default_credentials.json:/application_default_credentials.json
 
   app:
     image: dev-telephonic:dev
