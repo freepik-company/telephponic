@@ -1,3 +1,9 @@
+## 2.0.0 (2023-10-03)
+
+### Feat
+
+- avoid spans and context to be detached twice
+
 ## 1.2.0 (2023-09-27)
 
 ### Feat
