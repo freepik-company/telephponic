@@ -10,6 +10,15 @@ use PDOStatement;
 
 class PDO extends AbstractIntegration
 {
+    public function __construct(
+        private bool $tracePdoConnect = false,
+        private bool $tracePdoQuery = false,
+        private bool $tracePdoCommit = false,
+        private bool $tracePdoStatementQuery = false,
+        private bool $tracePdoStatementBindParam = false,
+    ) {
+    }
+
     /** @throws JsonException */
     public function tracePdoConnect(
         TargetPDO $pdo,
@@ -77,19 +86,68 @@ class PDO extends AbstractIntegration
         );
     }
 
+    public function tracePdoStatementBindParam(
+        PDOStatement $statement,
+        string|int $param,
+        mixed $var,
+        int $type = TargetPDO::PARAM_STR,
+        int $maxLength = 0,
+        mixed $driverOptions = null
+    ): array {
+        return $this->generateTraceParams(
+            'pdo/bind-param',
+            [
+                'pdo.statement.instance' => spl_object_hash($statement),
+                'pdo.param' => $this->convertToValue($param),
+                'pdo.value' => $this->convertToValue($var),
+                'pdo.type' => $this->mapPdoBindType($type),
+                'pdo.max_length' => $this->convertToValue($maxLength),
+                'pdo.driver_options' => $this->convertToValue($driverOptions),
+            ]
+        );
+    }
+
+    private function mapPdoBindType(int $type): string
+    {
+        return match ($type) {
+            TargetPDO::PARAM_BOOL => 'bool',
+            TargetPDO::PARAM_NULL => 'null',
+            TargetPDO::PARAM_INT => 'int',
+            TargetPDO::PARAM_STR => 'string',
+            TargetPDO::PARAM_LOB => 'lob',
+            default => 'unknown',
+        };
+    }
+
     protected function getMethods(): array
     {
-        return [
-            TargetPDO::class => [
-                'exec' => [$this, 'tracePdoQuery',],
-                'query' => [$this, 'tracePdoQuery',],
-                'commit' => [$this, 'tracePdoCommit'],
-                '__construct' => [$this, 'tracePdoConnect',],
-            ],
-            PDOStatement::class => [
-                'execute' => [$this, 'tracePdoStatementQuery'],
-            ],
+        $methods = [
+            TargetPDO::class => [],
+            PDOStatement::class => [],
         ];
+
+        if ($this->tracePdoConnect) {
+            $methods[TargetPDO::class]['__construct'] = [$this, 'tracePdoConnect'];
+        }
+
+        if ($this->tracePdoQuery) {
+            $methods[TargetPDO::class]['exec'] = [$this, 'tracePdoQuery'];
+            $methods[TargetPDO::class]['query'] = [$this, 'tracePdoQuery'];
+        }
+
+        if ($this->tracePdoCommit) {
+            $methods[TargetPDO::class]['commit'] = [$this, 'tracePdoCommit'];
+        }
+
+        if ($this->tracePdoStatementQuery) {
+            $methods[PDOStatement::class]['execute'] = [$this, 'tracePdoStatementQuery'];
+        }
+
+        if ($this->tracePdoStatementBindParam) {
+            $methods[PDOStatement::class]['bindParam'] = [$this, 'tracePdoStatementBindParam'];
+        }
+
+        return $methods;
     }
 
     protected function getFunctions(): array

@@ -390,8 +390,21 @@ class Builder
         );
     }
 
-    public function withPDOIntegration(): self
-    {
-        return $this->withIntegration(new PDO());
+    public function withPDOIntegration(
+        bool $tracePdoConnect = false,
+        bool $tracePdoQuery = false,
+        bool $tracePdoCommit = false,
+        bool $tracePdoStatementQuery = false,
+        bool $tracePdoStatementBindParam = false,
+    ): self {
+        return $this->withIntegration(
+            new PDO(
+                $tracePdoConnect,
+                $tracePdoQuery,
+                $tracePdoCommit,
+                $tracePdoStatementQuery,
+                $tracePdoStatementBindParam,
+            )
+        );
     }
 }
