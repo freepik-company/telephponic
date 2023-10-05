@@ -1,3 +1,9 @@
+## 2.2.0 (2023-10-05)
+
+### Feat
+
+- **Integrations**: make integrations optional (#5)
+
 ## 2.1.0 (2023-10-05)
 
 ### Feat
