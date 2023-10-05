@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "41b8ddb82e055c702ead5c70fce0a69a",
+    "content-hash": "91a4cd6f500a3f5cba523e62dac0a572",
     "packages": [
         {
             "name": "brick/math",
@@ -63,16 +63,16 @@
         },
         {
             "name": "firebase/php-jwt",
-            "version": "v6.8.1",
+            "version": "v6.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "5dbc8959427416b8ee09a100d7a8588c00fb2e26"
+                "reference": "f03270e63eaccf3019ef0f32849c497385774e11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/5dbc8959427416b8ee09a100d7a8588c00fb2e26",
-                "reference": "5dbc8959427416b8ee09a100d7a8588c00fb2e26",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/f03270e63eaccf3019ef0f32849c497385774e11",
+                "reference": "f03270e63eaccf3019ef0f32849c497385774e11",
                 "shasum": ""
             },
             "require": {
@@ -120,9 +120,9 @@
             ],
             "support": {
                 "issues": "https://github.com/firebase/php-jwt/issues",
-                "source": "https://github.com/firebase/php-jwt/tree/v6.8.1"
+                "source": "https://github.com/firebase/php-jwt/tree/v6.9.0"
             },
-            "time": "2023-07-14T18:33:00+00:00"
+            "time": "2023-10-05T00:24:42+00:00"
         },
         {
             "name": "google/auth",
@@ -184,16 +184,16 @@
         },
         {
             "name": "google/cloud-core",
-            "version": "v1.52.4",
+            "version": "v1.52.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-core.git",
-                "reference": "21c004745a32c71e03ab62effd7fbee0cf3ae7c6"
+                "reference": "28765cf75bd028ed063b0422b9c85bb9a54c41ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/21c004745a32c71e03ab62effd7fbee0cf3ae7c6",
-                "reference": "21c004745a32c71e03ab62effd7fbee0cf3ae7c6",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/28765cf75bd028ed063b0422b9c85bb9a54c41ca",
+                "reference": "28765cf75bd028ed063b0422b9c85bb9a54c41ca",
                 "shasum": ""
             },
             "require": {
@@ -243,22 +243,22 @@
             ],
             "description": "Google Cloud PHP shared dependency, providing functionality useful to all components.",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.52.4"
+                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.52.5"
             },
-            "time": "2023-09-15T20:50:36+00:00"
+            "time": "2023-09-30T16:50:41+00:00"
         },
         {
             "name": "google/cloud-trace",
-            "version": "v1.6.3",
+            "version": "v1.6.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-trace.git",
-                "reference": "618486aa157cc753cc6ee877534e91135789519c"
+                "reference": "5ce251573267430ad9b0055728bfc5056cb01f1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-trace/zipball/618486aa157cc753cc6ee877534e91135789519c",
-                "reference": "618486aa157cc753cc6ee877534e91135789519c",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-trace/zipball/5ce251573267430ad9b0055728bfc5056cb01f1d",
+                "reference": "5ce251573267430ad9b0055728bfc5056cb01f1d",
                 "shasum": ""
             },
             "require": {
@@ -300,22 +300,22 @@
             ],
             "description": "Stackdriver Trace Client for PHP",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-trace/tree/v1.6.3"
+                "source": "https://github.com/googleapis/google-cloud-php-trace/tree/v1.6.4"
             },
-            "time": "2023-09-15T20:50:36+00:00"
+            "time": "2023-09-30T16:50:41+00:00"
         },
         {
             "name": "google/common-protos",
-            "version": "v4.3.0",
+            "version": "v4.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/common-protos-php.git",
-                "reference": "4ab56787c4f7c34277055ea7bd9982ad758b2c67"
+                "reference": "04b6c213e0add963dab058329caf2d2d9014129a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/common-protos-php/zipball/4ab56787c4f7c34277055ea7bd9982ad758b2c67",
-                "reference": "4ab56787c4f7c34277055ea7bd9982ad758b2c67",
+                "url": "https://api.github.com/repos/googleapis/common-protos-php/zipball/04b6c213e0add963dab058329caf2d2d9014129a",
+                "reference": "04b6c213e0add963dab058329caf2d2d9014129a",
                 "shasum": ""
             },
             "require": {
@@ -352,9 +352,9 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/common-protos-php/issues",
-                "source": "https://github.com/googleapis/common-protos-php/tree/v4.3.0"
+                "source": "https://github.com/googleapis/common-protos-php/tree/v4.4.0"
             },
-            "time": "2023-08-22T18:10:13+00:00"
+            "time": "2023-10-02T18:14:18+00:00"
         },
         {
             "name": "google/gax",
@@ -502,16 +502,16 @@
         },
         {
             "name": "google/protobuf",
-            "version": "v3.24.3",
+            "version": "v3.24.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/protocolbuffers/protobuf-php.git",
-                "reference": "2fc191fc5e137829081b8700086ac6ed7003b925"
+                "reference": "672d69e25f71b9364fdf1810eb8a8573defdc404"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/2fc191fc5e137829081b8700086ac6ed7003b925",
-                "reference": "2fc191fc5e137829081b8700086ac6ed7003b925",
+                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/672d69e25f71b9364fdf1810eb8a8573defdc404",
+                "reference": "672d69e25f71b9364fdf1810eb8a8573defdc404",
                 "shasum": ""
             },
             "require": {
@@ -540,9 +540,9 @@
                 "proto"
             ],
             "support": {
-                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v3.24.3"
+                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v3.24.4"
             },
-            "time": "2023-09-07T15:39:13+00:00"
+            "time": "2023-10-04T17:22:47+00:00"
         },
         {
             "name": "grpc/grpc",
@@ -2405,16 +2405,16 @@
         },
         {
             "name": "symfony/http-client",
-            "version": "v6.3.2",
+            "version": "v6.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-client.git",
-                "reference": "15f9f4bad62bfcbe48b5dedd866f04a08fc7ff00"
+                "reference": "213e564da4cbf61acc9728d97e666bcdb868c10d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-client/zipball/15f9f4bad62bfcbe48b5dedd866f04a08fc7ff00",
-                "reference": "15f9f4bad62bfcbe48b5dedd866f04a08fc7ff00",
+                "url": "https://api.github.com/repos/symfony/http-client/zipball/213e564da4cbf61acc9728d97e666bcdb868c10d",
+                "reference": "213e564da4cbf61acc9728d97e666bcdb868c10d",
                 "shasum": ""
             },
             "require": {
@@ -2477,7 +2477,7 @@
                 "http"
             ],
             "support": {
-                "source": "https://github.com/symfony/http-client/tree/v6.3.2"
+                "source": "https://github.com/symfony/http-client/tree/v6.3.5"
             },
             "funding": [
                 {
@@ -2493,7 +2493,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-07-05T08:41:27+00:00"
+            "time": "2023-09-29T15:57:12+00:00"
         },
         {
             "name": "symfony/http-client-contracts",
@@ -2983,16 +2983,16 @@
     "packages-dev": [
         {
             "name": "symfony/var-dumper",
-            "version": "v6.3.4",
+            "version": "v6.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "2027be14f8ae8eae999ceadebcda5b4909b81d45"
+                "reference": "3d9999376be5fea8de47752837a3e1d1c5f69ef5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/2027be14f8ae8eae999ceadebcda5b4909b81d45",
-                "reference": "2027be14f8ae8eae999ceadebcda5b4909b81d45",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/3d9999376be5fea8de47752837a3e1d1c5f69ef5",
+                "reference": "3d9999376be5fea8de47752837a3e1d1c5f69ef5",
                 "shasum": ""
             },
             "require": {
@@ -3047,7 +3047,7 @@
                 "dump"
             ],
             "support": {
-                "source": "https://github.com/symfony/var-dumper/tree/v6.3.4"
+                "source": "https://github.com/symfony/var-dumper/tree/v6.3.5"
             },
             "funding": [
                 {
@@ -3063,7 +3063,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-08-24T14:51:05+00:00"
+            "time": "2023-09-12T10:11:35+00:00"
         }
     ],
     "aliases": [],
@@ -3077,12 +3077,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.1.0",
-        "ext-curl": "*",
-        "ext-grpc": "*",
-        "ext-memcached": "*",
-        "ext-pdo": "*",
-        "ext-redis": "*"
+        "php": "^8.1"
     },
     "platform-dev": [],
     "plugin-api-version": "2.6.0"
