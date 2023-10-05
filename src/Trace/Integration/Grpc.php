@@ -5,9 +5,17 @@ declare(strict_types=1);
 namespace GR\Telephponic\Trace\Integration;
 
 use Grpc\BaseStub;
+use \RuntimeException;
 
 class Grpc extends AbstractIntegration
 {
+    /** @throws RuntimeException */
+    public function __construct()
+    {
+        if (!extension_loaded('grpc')) {
+            throw new RuntimeException('The grpc extension is not loaded');
+        }
+    }
 
     public function traceGrpcSimpleRequest(
         BaseStub $stub,

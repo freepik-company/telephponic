@@ -16,12 +16,7 @@
   ],
   "minimum-stability": "beta",
   "require": {
-    "php": "^8.1.0",
-    "ext-curl": "*",
-    "ext-grpc": "*",
-    "ext-memcached": "*",
-    "ext-pdo": "*",
-    "ext-redis": "*",
+    "php": "^8.1",
     "google/cloud-trace": "^1.6",
     "google/protobuf": "^v3.3.0",
     "grpc/grpc": "^1.52",
@@ -44,7 +39,12 @@
     "ext-protobuf": "Significant performance improvement for otlp+protobuf exporting",
     "ext-mbstring": "More performant than the fallback, symfony/polyfill-mbstring",
     "ext-zlib": "If you want to compress exported data",
-    "ext-ffi": "Fiber-based context storage"
+    "ext-ffi": "Fiber-based context storage",
+    "ext-curl": "If you want to use the curl exporter",
+    "ext-grpc": "If you want to use the grpc exporter",
+    "ext-memcached": "If you want to profile memcached",
+    "ext-pdo": "If you want to profile PDO",
+    "ext-redis": "If you want to profile redis"
   },
   "require-dev": {
     "symfony/var-dumper": "^6.3"
