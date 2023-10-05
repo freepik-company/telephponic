@@ -8,7 +8,6 @@ use Grpc\BaseStub;
 
 class Grpc extends AbstractIntegration
 {
-
     public function traceGrpcSimpleRequest(
         BaseStub $stub,
         string $method,
