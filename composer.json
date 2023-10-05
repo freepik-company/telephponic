@@ -40,7 +40,7 @@
     "ext-mbstring": "More performant than the fallback, symfony/polyfill-mbstring",
     "ext-zlib": "If you want to compress exported data",
     "ext-ffi": "Fiber-based context storage",
-    "ext-curl": "If you want to use the curl exporter",
+    "ext-curl": "If you want to profile curl",
     "ext-grpc": "If you want to use the grpc exporter",
     "ext-memcached": "If you want to profile memcached",
     "ext-pdo": "If you want to profile PDO",
