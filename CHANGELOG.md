@@ -1,3 +1,10 @@
+## 2.1.0 (2023-10-05)
+
+### Feat
+
+- **Integrations**: make integrations optional (#5)
+- **integration/pdo**: add support to autowatch PdoStatement::bindParam function (#4)
+
 ## 2.0.0 (2023-10-03)
 
 ### Feat
