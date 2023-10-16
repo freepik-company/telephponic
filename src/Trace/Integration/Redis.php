@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace GR\Telephponic\Trace\Integration;
 
+use \RuntimeException;
+
 class Redis extends AbstractIntegration
 {
+    /** @throws RuntimeException */
     public function __construct(
         private readonly bool $traceConnect = false,
         private readonly bool $traceOpen = false,
@@ -21,6 +24,9 @@ class Redis extends AbstractIntegration
         private readonly bool $traceUnlink = false,
         private readonly bool $traceExists = false,
     ) {
+        if (!extension_loaded('redis')) {
+            throw new RuntimeException('Redis extension is not loaded');
+        }
     }
 
     public function traceConnect(

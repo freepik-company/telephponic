@@ -7,9 +7,11 @@ namespace GR\Telephponic\Trace\Integration;
 use JsonException;
 use PDO as TargetPDO;
 use PDOStatement;
+use \RuntimeException;
 
 class PDO extends AbstractIntegration
 {
+    /** @throws RuntimeException */
     public function __construct(
         private bool $tracePdoConnect = false,
         private bool $tracePdoQuery = false,
@@ -17,6 +19,9 @@ class PDO extends AbstractIntegration
         private bool $tracePdoStatementQuery = false,
         private bool $tracePdoStatementBindParam = false,
     ) {
+        if (!extension_loaded('pdo')) {
+            throw new RuntimeException('PDO extension is not loaded');
+        }
     }
 
     /** @throws JsonException */
