@@ -31,7 +31,9 @@ $tracer->addWatcherToFunction('sleep', static function (int $time): array {
     ];
 });
 
-$tracer->start('search-engine');
+$longText = str_repeat('a', 1000);
+
+$tracer->start('search-engine', ['long.text' => $longText]);
 $tracer->addEvent('search-engine-started', ['search-engine' => 'started']);
 sleep(1);
 $tracer->start('search-engine-child');
