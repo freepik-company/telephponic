@@ -309,9 +309,9 @@ class Builder
     }
 
     public function withCurlIntegration(
-        bool $traceCurlInit = false,
-        bool $traceCurlExec = false,
-        bool $traceCurlSetOpt = false
+        bool $traceCurlInit = true,
+        bool $traceCurlExec = true,
+        bool $traceCurlSetOpt = true,
     ): self {
         return $this->withIntegration(
             new Curl(
@@ -329,19 +329,30 @@ class Builder
         return $this;
     }
 
-    public function withGrpcIntegration(): self
-    {
-        return $this->withIntegration(new Grpc());
+    public function withGrpcIntegration(
+        bool $traceGrpcSimpleRequest = true,
+        bool $traceGrpcClientStreamRequest = true,
+        bool $traceGrpcServerStreamRequest = true,
+        bool $traceGrpcBidiRequest = true,
+    ): self {
+        return $this->withIntegration(
+            new Grpc(
+                $traceGrpcSimpleRequest,
+                $traceGrpcClientStreamRequest,
+                $traceGrpcServerStreamRequest,
+                $traceGrpcBidiRequest,
+            )
+        );
     }
 
     public function withMemcachedIntegration(
-        bool $traceAdd = false,
-        bool $traceDelete = false,
-        bool $traceDeleteMulti = false,
-        bool $traceGet = false,
-        bool $traceGetMulti = false,
-        bool $traceSet = false,
-        bool $traceSetMulti = false,
+        bool $traceAdd = true,
+        bool $traceDelete = true,
+        bool $traceDeleteMulti = true,
+        bool $traceGet = true,
+        bool $traceGetMulti = true,
+        bool $traceSet = true,
+        bool $traceSetMulti = true,
     ): self {
         return $this->withIntegration(
             new Memcached(
@@ -357,19 +368,19 @@ class Builder
     }
 
     public function withRedisIntegration(
-        bool $traceConnect = false,
-        bool $traceOpen = false,
-        bool $tracePconnect = false,
-        bool $tracePopen = false,
-        bool $traceClose = false,
-        bool $tracePing = false,
-        bool $traceEcho = false,
-        bool $traceGet = false,
-        bool $traceSet = false,
-        bool $traceDel = false,
-        bool $traceDelete = false,
-        bool $traceUnlink = false,
-        bool $traceExists = false,
+        bool $traceConnect = true,
+        bool $traceOpen = true,
+        bool $tracePconnect = true,
+        bool $tracePopen = true,
+        bool $traceClose = true,
+        bool $tracePing = true,
+        bool $traceEcho = true,
+        bool $traceGet = true,
+        bool $traceSet = true,
+        bool $traceDel = true,
+        bool $traceDelete = true,
+        bool $traceUnlink = true,
+        bool $traceExists = true,
     ): self {
         return $this->withIntegration(
             new Redis(
@@ -391,11 +402,11 @@ class Builder
     }
 
     public function withPDOIntegration(
-        bool $tracePdoConnect = false,
-        bool $tracePdoQuery = false,
-        bool $tracePdoCommit = false,
-        bool $tracePdoStatementQuery = false,
-        bool $tracePdoStatementBindParam = false,
+        bool $tracePdoConnect = true,
+        bool $tracePdoQuery = true,
+        bool $tracePdoCommit = true,
+        bool $tracePdoStatementQuery = true,
+        bool $tracePdoStatementBindParam = true,
     ): self {
         return $this->withIntegration(
             new PDO(
