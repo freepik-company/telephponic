@@ -13,6 +13,7 @@ function recursiveFunction(Telephponic $tracer, int $number = 10): int
 {
     if ($number === 0) {
         $tracer->start('recursiveFunction', ['number' => $number]);
+        $tracer->addException(new RuntimeException('recursive exception'));
         $tracer->end();
 
         return 0;
@@ -31,6 +32,7 @@ $builder->enableBatchMode()
         ->withProbabilitySampler(1)
         ->withRedisIntegration(true, true, true, true, true, true, true)
         ->withCurlIntegration(true, true, true)
+        ->enableAddTraceAsAttribute()
         ->withPDOIntegration()
 ;
 
