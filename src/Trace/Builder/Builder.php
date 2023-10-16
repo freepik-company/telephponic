@@ -414,10 +414,10 @@ class Builder
 
     public function enableAddTraceAsAttribute(): self
     {
-        return $this->withPlaintTextStacktraceProvider();
+        return $this->withPlainTextStacktraceProvider();
     }
 
-    public function withPlaintTextStacktraceProvider(): self
+    public function withPlainTextStacktraceProvider(): self
     {
         return $this->withStacktraceProvider(new PlainTextStacktraceProvider());
     }

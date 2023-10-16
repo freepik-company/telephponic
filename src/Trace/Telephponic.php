@@ -27,7 +27,7 @@ class Telephponic
         private readonly TracerProviderInterface $tracerProvider,
         private readonly array $defaultAttributes = [],
         private readonly bool $registerShutdown = true,
-        readonly ?StacktraceProvider $stacktraceProvider = null,
+        private readonly ?StacktraceProvider $stacktraceProvider = null,
         Integration ...$integrations
     ) {
         $this->tracer = $this->tracerProvider->getTracer('telephponic-tracer');
