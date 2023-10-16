@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace GR\Telephponic\Trace\Integration;
 
+use \RuntimeException;
+
 class Curl extends AbstractIntegration
 {
-
+    /** @throws RuntimeException */
     public function __construct(
         private readonly bool $traceCurlInit = false,
         private readonly bool $traceCurlExec = false,
         private readonly bool $traceCurlSetOpt = false
     ) {
+        if (!extension_loaded('curl')) {
+            throw new RuntimeException('Curl extension is not loaded');
+        }
     }
 
     public function traceCurlInit(?string $url): array
@@ -31,7 +36,7 @@ class Curl extends AbstractIntegration
             ? []
             : array_merge(
                 ...array_map(
-                    fn($key, $value) => [
+                    fn ($key, $value) => [
                         sprintf('curl.%s', $key) => $this->convertToValue($value),
                     ],
                     array_keys($curlInfo),
@@ -186,5 +191,4 @@ class Curl extends AbstractIntegration
 
         return $functions;
     }
-
 }

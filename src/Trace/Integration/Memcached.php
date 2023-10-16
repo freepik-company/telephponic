@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace GR\Telephponic\Trace\Integration;
 
+use \RuntimeException;
+
 class Memcached extends AbstractIntegration
 {
+    /** @throws RuntimeException */
     public function __construct(
         private readonly bool $traceAdd = false,
         private readonly bool $traceDelete = false,
@@ -15,6 +18,9 @@ class Memcached extends AbstractIntegration
         private readonly bool $traceSet = false,
         private readonly bool $traceSetMulti = false,
     ) {
+        if (!extension_loaded('memcached')) {
+            throw new RuntimeException('Memcached extension is not loaded');
+        }
     }
 
     protected function getMethods(): array
