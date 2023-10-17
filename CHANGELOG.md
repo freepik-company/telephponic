@@ -1,3 +1,20 @@
+## 3.0.0 (2023-10-17)
+
+### Feat
+
+- add support to enable stacktrace as trace attribute (#7)
+- **integrations**: switch default value for trace flags from `false` to `true`
+- **Builder**: update type withXxxIntegration to provided trace flags as true by default
+
+This is no a BC level change, but it can completely change the behaviour of your current setup, so be careful.
+- **integrations/PDO**: add pdo or pdoStatement instance id to all traces related to (#9)
+
+### Fix
+
+- **Builder**: remove some methods that triggers error for dynamic property declaration (#6)
+
+## 2.1.0 (2023-10-03)
+
 ## 2.2.0 (2023-10-05)
 
 ### Feat
