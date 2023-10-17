@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace GR\Telephponic\Trace\Integration;
 
-use \RuntimeException;
+use RuntimeException;
 
 class Memcached extends AbstractIntegration
 {
     /** @throws RuntimeException */
     public function __construct(
-        private readonly bool $traceAdd = false,
-        private readonly bool $traceDelete = false,
-        private readonly bool $traceDeleteMulti = false,
-        private readonly bool $traceGet = false,
-        private readonly bool $traceGetMulti = false,
-        private readonly bool $traceSet = false,
-        private readonly bool $traceSetMulti = false,
+        private readonly bool $traceAdd = true,
+        private readonly bool $traceDelete = true,
+        private readonly bool $traceDeleteMulti = true,
+        private readonly bool $traceGet = true,
+        private readonly bool $traceGetMulti = true,
+        private readonly bool $traceSet = true,
+        private readonly bool $traceSetMulti = true,
     ) {
         if (!extension_loaded('memcached')) {
             throw new RuntimeException('Memcached extension is not loaded');

@@ -13,11 +13,11 @@ class PDO extends AbstractIntegration
 {
     /** @throws RuntimeException */
     public function __construct(
-        private bool $tracePdoConnect = false,
-        private bool $tracePdoQuery = false,
-        private bool $tracePdoCommit = false,
-        private bool $tracePdoStatementQuery = false,
-        private bool $tracePdoStatementBindParam = false,
+        private bool $tracePdoConnect = true,
+        private bool $tracePdoQuery = true,
+        private bool $tracePdoCommit = true,
+        private bool $tracePdoStatementQuery = true,
+        private bool $tracePdoStatementBindParam = true,
     ) {
         if (!extension_loaded('pdo')) {
             throw new RuntimeException('PDO extension is not loaded');
