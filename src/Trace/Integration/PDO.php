@@ -7,17 +7,17 @@ namespace GR\Telephponic\Trace\Integration;
 use JsonException;
 use PDO as TargetPDO;
 use PDOStatement;
-use \RuntimeException;
+use RuntimeException;
 
 class PDO extends AbstractIntegration
 {
     /** @throws RuntimeException */
     public function __construct(
-        private bool $tracePdoConnect = false,
-        private bool $tracePdoQuery = false,
-        private bool $tracePdoCommit = false,
-        private bool $tracePdoStatementQuery = false,
-        private bool $tracePdoStatementBindParam = false,
+        private bool $tracePdoConnect = true,
+        private bool $tracePdoQuery = true,
+        private bool $tracePdoCommit = true,
+        private bool $tracePdoStatementQuery = true,
+        private bool $tracePdoStatementBindParam = true,
     ) {
         if (!extension_loaded('pdo')) {
             throw new RuntimeException('PDO extension is not loaded');
@@ -38,6 +38,7 @@ class PDO extends AbstractIntegration
                 'pdo.dsn' => $this->convertToValue($dsn),
                 'pdo.username' => $this->convertToValue($username),
                 'pdo.options' => $this->convertToValue($options),
+                'pdo.instance' => spl_object_hash($pdo),
             ]
         );
     }
@@ -52,6 +53,7 @@ class PDO extends AbstractIntegration
             [
                 'pdo.query' => $this->sanitizeQuery($query),
                 'pdo.params' => $this->convertToValue($params),
+                'pdo.instance' => spl_object_hash($pdo),
             ]
         );
     }
@@ -74,6 +76,7 @@ class PDO extends AbstractIntegration
             [
                 'pdo.dsn' => $this->convertToValue($pdo->getAttribute(TargetPDO::ATTR_CONNECTION_STATUS)),
                 'pdo.username' => $this->convertToValue($pdo->getAttribute(TargetPDO::ATTR_DRIVER_NAME)),
+                'pdo.instance' => spl_object_hash($pdo),
             ]
         );
     }
@@ -87,6 +90,7 @@ class PDO extends AbstractIntegration
             [
                 'pdo.query' => $this->sanitizeQuery($statement->queryString),
                 'pdo.params' => $this->convertToValue($params),
+                'pdo.statement.instance' => spl_object_hash($statement),
             ]
         );
     }
@@ -103,11 +107,11 @@ class PDO extends AbstractIntegration
             'pdo/bind-param',
             [
                 'pdo.statement.instance' => spl_object_hash($statement),
-                'pdo.param' => $this->convertToValue($param),
-                'pdo.value' => $this->convertToValue($var),
-                'pdo.type' => $this->mapPdoBindType($type),
-                'pdo.max_length' => $this->convertToValue($maxLength),
-                'pdo.driver_options' => $this->convertToValue($driverOptions),
+                'pdo.bind.param' => $this->convertToValue($param),
+                'pdo.bind.value' => $this->convertToValue($var),
+                'pdo.bind.type' => $this->mapPdoBindType($type),
+                'pdo.bind.max_length' => $this->convertToValue($maxLength),
+                'pdo.bind.driver_options' => $this->convertToValue($driverOptions),
             ]
         );
     }

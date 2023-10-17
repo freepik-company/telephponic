@@ -8,6 +8,14 @@ use Grpc\BaseStub;
 
 class Grpc extends AbstractIntegration
 {
+    public function __construct(
+        private readonly bool $traceGrpcSimpleRequest = true,
+        private readonly bool $traceGrpcClientStreamRequest = true,
+        private readonly bool $traceGrpcServerStreamRequest = true,
+        private readonly bool $traceGrpcBidiRequest = true
+    ) {
+    }
+
     public function traceGrpcSimpleRequest(
         BaseStub $stub,
         string $method,
@@ -73,14 +81,27 @@ class Grpc extends AbstractIntegration
 
     protected function getMethods(): array
     {
-        return [
-            BaseStub::class => [
-                '_simpleRequest' => [$this, ' traceGrpcSimpleRequest'],
-                '_clientStreamRequest' => [$this, ' traceGrpcClientStreamRequest'],
-                '_serverStreamRequest' => [$this, ' traceGrpcServerStreamRequest'],
-                '_bidiRequest' => [$this, ' traceGrpcBidiRequest'],
-            ],
+        $methods = [
+            BaseStub::class => [],
         ];
+
+        if ($this->traceGrpcSimpleRequest) {
+            $methods[BaseStub::class]['_simpleRequest'] = [$this, ' traceGrpcSimpleRequest'];
+        }
+
+        if ($this->traceGrpcClientStreamRequest) {
+            $methods[BaseStub::class]['_clientStreamRequest'] = [$this, ' traceGrpcClientStreamRequest'];
+        }
+
+        if ($this->traceGrpcServerStreamRequest) {
+            $methods[BaseStub::class]['_serverStreamRequest'] = [$this, ' traceGrpcServerStreamRequest'];
+        }
+
+        if ($this->traceGrpcBidiRequest) {
+            $methods[BaseStub::class]['_bidiRequest'] = [$this, ' traceGrpcBidiRequest'];
+        }
+
+        return $methods;
     }
 
     protected function getFunctions(): array
