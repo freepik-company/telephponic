@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GR\Telephponic\Trace;
 
 use GR\Telephponic\Trace\Integration\Integration;
+use GR\Telephponic\Trace\Stacktrace\StacktraceProvider;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\StatusCode;
@@ -26,6 +27,7 @@ class Telephponic
         private readonly TracerProviderInterface $tracerProvider,
         private readonly array $defaultAttributes = [],
         private readonly bool $registerShutdown = true,
+        private readonly ?StacktraceProvider $stacktraceProvider = null,
         Integration ...$integrations
     ) {
         $this->tracer = $this->tracerProvider->getTracer('telephponic-tracer');
@@ -128,7 +130,15 @@ class Telephponic
     public function end(): void
     {
         $scope = $this->getScope();
-        $this->getSpan()->end();
+        $span = $this->getSpan();
+        if (null !== $this->stacktraceProvider) {
+            $stacktrace = $this->stacktraceProvider->getStacktraces();
+            if (!empty($stacktrace)) {
+                $span->setAttribute('span.stacktrace', $stacktrace);
+            }
+        }
+
+        $span->end();
         $scope?->detach();
     }
 

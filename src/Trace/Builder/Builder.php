@@ -11,6 +11,8 @@ use GR\Telephponic\Trace\Integration\Integration;
 use GR\Telephponic\Trace\Integration\Memcached;
 use GR\Telephponic\Trace\Integration\PDO;
 use GR\Telephponic\Trace\Integration\Redis;
+use GR\Telephponic\Trace\Stacktrace\PlainTextStacktraceProvider;
+use GR\Telephponic\Trace\Stacktrace\StacktraceProvider;
 use GR\Telephponic\Trace\Telephponic;
 use InvalidArgumentException;
 use OpenTelemetry\API\Common\Signal\Signals;
@@ -50,6 +52,7 @@ class Builder
     private bool $batchMode = false;
     private array $defaultAttributes = [];
     private $registerShutdown = true;
+    private ?StacktraceProvider $stacktraceProvider = null;
     private array $integrations = [];
 
     public function __construct(
@@ -230,6 +233,7 @@ class Builder
             $tracer,
             $this->defaultAttributes,
             $this->registerShutdown,
+            $this->stacktraceProvider,
             ...$this->integrations,
         );
     }
@@ -417,5 +421,29 @@ class Builder
                 $tracePdoStatementBindParam,
             )
         );
+    }
+
+    public function enableAddTraceAsAttribute(): self
+    {
+        return $this->withPlainTextStacktraceProvider();
+    }
+
+    public function withPlainTextStacktraceProvider(): self
+    {
+        return $this->withStacktraceProvider(new PlainTextStacktraceProvider());
+    }
+
+    public function withStacktraceProvider(StacktraceProvider $stacktraceProvider): self
+    {
+        $this->stacktraceProvider = $stacktraceProvider;
+
+        return $this;
+    }
+
+    public function disableAddTraceAsAttribute(): self
+    {
+        $this->stacktraceProvider = null;
+
+        return $this;
     }
 }
