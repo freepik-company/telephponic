@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace GR\Telephponic\Trace\Builder;
 
-use Exception;
 use GR\Telephponic\Trace\Integration\Curl;
 use GR\Telephponic\Trace\Integration\Grpc;
 use GR\Telephponic\Trace\Integration\Integration;
@@ -21,7 +20,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\Contrib\Zipkin\Exporter;
+use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
@@ -41,6 +40,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use RuntimeException;
 
 class Builder
 {
@@ -51,9 +51,10 @@ class Builder
     private ?SpanExporterInterface $exporter = null;
     private bool $batchMode = false;
     private array $defaultAttributes = [];
-    private $registerShutdown = true;
+    private bool $registerShutdown = true;
     private ?StacktraceProvider $stacktraceProvider = null;
     private array $integrations = [];
+    private TextMapPropagatorInterface $propagator;
 
     public function __construct(
         private readonly string $appName,
@@ -140,43 +141,23 @@ class Builder
     {
         return $this
             ->withTransport(PsrTransportFactory::discover()->create($url, 'application/json'))
-            ->withExporter(new Exporter($name, $this->transport))
+            ->withExporter(new ZipkinExporter($name, $this->transport))
         ;
     }
 
-    public function enableShutdownHandler(): self
-    {
-        $this->enableShutdownHandler = true;
-
-        return $this;
-    }
-
-    public function disableShutdownHandler(): self
-    {
-        $this->enableShutdownHandler = false;
-
-        return $this;
-    }
-
+    /** @throws RuntimeException */
     public function withDefaultSpanExporter(): self
     {
         if ($this->transport === null) {
-            throw new Exception('Transport not set'); // fixme Use a custom exception
+            throw new RuntimeException('Transport not set'); // fixme Use a custom exception
         }
 
-        return $this->withSpanExporter(new SpanExporter($this->transport));
-    }
-
-    private function withSpanExporter(SpanExporterInterface $spanExporter): self
-    {
-        $this->spanExporter = $spanExporter;
-
-        return $this;
+        return $this->withExporter(new SpanExporter($this->transport));
     }
 
     public function withInMemoryExporter(): self
     {
-        return $this->withSpanExporter(new InMemoryExporter());
+        return $this->withExporter(new InMemoryExporter());
     }
 
     public function withTraceContextPropagator(): self
@@ -206,7 +187,7 @@ class Builder
     public function build(): Telephponic
     {
         if ($this->exporter === null) {
-            throw new Exception('Exporter is not set'); // fixme Use a custom exception
+            throw new RuntimeException('Exporter is not set'); // fixme Use a custom exception
         }
 
         if ($this->resourceInfo === null) {
