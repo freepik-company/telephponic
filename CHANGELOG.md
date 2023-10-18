@@ -1,3 +1,9 @@
+## 3.0.1 (2023-10-18)
+
+### Fix
+
+- **Telephponic**: modify the way current context is fetched and used to avoid error for null context when shutdown (#11)
+
 ## 3.0.0 (2023-10-17)
 
 ### Feat
