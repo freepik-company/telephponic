@@ -12,6 +12,7 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ContextStorageScopeInterface;
 use RuntimeException;
 use Throwable;
@@ -44,9 +45,24 @@ class Telephponic
 
     public function start(string $name, array $attributes = []): void
     {
-        $span = $this->tracer->spanBuilder($name)->startSpan();
+        $span = $this->createSpan($name);
         $span->setAttributes($this->defaultAttributes + $attributes);
-        Context::storage()->attach($span->storeInContext(Context::getCurrent()));
+        $this->saveSpan($span);
+    }
+
+    private function createSpan(string $name): SpanInterface
+    {
+        return $this->tracer->spanBuilder($name)->startSpan();
+    }
+
+    private function saveSpan(SpanInterface $span): void
+    {
+        Context::storage()->attach($span->storeInContext($this->getCurrentContext()));
+    }
+    
+    private function getCurrentContext(): ContextInterface
+    {
+        return Context::getCurrent();
     }
 
     private function getRootAttributes(): array
@@ -99,20 +115,8 @@ class Telephponic
 
     public function addEvent(string $eventName, array $attributes = []): void
     {
-        $scope = $this->getScope();
-        if (null === $scope) {
-            return;
-        }
-        $span = Span::fromContext($scope->context());
+        $span = Span::fromContext($this->getCurrentContext());
         $span->addEvent($eventName, $attributes);
-    }
-
-    /**
-     * @return null|ContextStorageScopeInterface
-     */
-    public function getScope(): ?ContextStorageScopeInterface
-    {
-        return Context::storage()->scope();
     }
 
     public function sendTraces(): void
@@ -142,9 +146,17 @@ class Telephponic
         $scope?->detach();
     }
 
+    /**
+     * @return null|ContextStorageScopeInterface
+     */
+    private function getScope(): ?ContextStorageScopeInterface
+    {
+        return Context::storage()->scope();
+    }
+
     public function getSpan(): SpanInterface
     {
-        return Span::fromContext($this->getScope()?->context());
+        return Span::fromContext($this->getCurrentContext());
     }
 
     public function addWatcherToMethod(string $class, string $method, $closure): void
