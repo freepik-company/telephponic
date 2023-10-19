@@ -13,7 +13,7 @@ abstract class AbstractIntegration implements Integration
     {
         foreach ($this->getMethods() as $class => $methods) {
             foreach ($methods as $method => $callable) {
-                $tp->addWatcherToMethod($class, $method, $callable);
+                $tp->addWatcherToMethod($class, trim($method), $callable);
             }
         }
 

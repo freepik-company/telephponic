@@ -16,11 +16,14 @@ class Grpc extends AbstractIntegration
     ) {
     }
 
+    /**
+     * REVIEW: Is $deserializedData the actual deserialized data or the deserializer?
+     */
     public function traceGrpcSimpleRequest(
         BaseStub $stub,
         string $method,
         mixed $argument,
-        callable $deserialize,
+        mixed $deserializedData,
         array $metadata = [],
         array $options = []
     ): array {
@@ -86,19 +89,19 @@ class Grpc extends AbstractIntegration
         ];
 
         if ($this->traceGrpcSimpleRequest) {
-            $methods[BaseStub::class]['_simpleRequest'] = [$this, ' traceGrpcSimpleRequest'];
+            $methods[BaseStub::class]['_simpleRequest'] = [$this, 'traceGrpcSimpleRequest'];
         }
 
         if ($this->traceGrpcClientStreamRequest) {
-            $methods[BaseStub::class]['_clientStreamRequest'] = [$this, ' traceGrpcClientStreamRequest'];
+            $methods[BaseStub::class]['_clientStreamRequest'] = [$this, 'traceGrpcClientStreamRequest'];
         }
 
         if ($this->traceGrpcServerStreamRequest) {
-            $methods[BaseStub::class]['_serverStreamRequest'] = [$this, ' traceGrpcServerStreamRequest'];
+            $methods[BaseStub::class]['_serverStreamRequest'] = [$this, 'traceGrpcServerStreamRequest'];
         }
 
         if ($this->traceGrpcBidiRequest) {
-            $methods[BaseStub::class]['_bidiRequest'] = [$this, ' traceGrpcBidiRequest'];
+            $methods[BaseStub::class]['_bidiRequest'] = [$this, 'traceGrpcBidiRequest'];
         }
 
         return $methods;
