@@ -1,3 +1,9 @@
+## 3.0.2 (2023-10-19)
+
+### Fix
+
+- **gRPC-integration**: remove a space character from methods name (#12)
+
 ## 3.0.1 (2023-10-18)
 
 ### Fix
