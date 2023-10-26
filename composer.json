@@ -29,7 +29,8 @@
     "open-telemetry/sdk": "@stable",
     "open-telemetry/transport-grpc": "@stable",
     "php-http/httplug": "^2.4",
-    "symfony/http-client": "^6.3"
+    "symfony/http-client": "^6.3",
+    "guzzlehttp/guzzle": "^7"
   },
   "config": {
     "allow-plugins": {
