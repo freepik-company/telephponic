@@ -1,3 +1,9 @@
+## 3.0.3 (2023-10-31)
+
+### Fix
+
+- **Curl.php**: fix error tracking curl_init without any parameters passed
+
 ## 3.0.2 (2023-10-19)
 
 ### Fix
