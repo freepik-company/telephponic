@@ -19,7 +19,7 @@ class Curl extends AbstractIntegration
         }
     }
 
-    public function traceCurlInit(?string $url): array
+    public function traceCurlInit(?string $url = null): array
     {
         return $this->generateTraceParams('curl/open', [
             'curl.url' => $this->convertToValue($url),
