@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace GR\Telephponic\Trace\Builder;
 
-use Exception;
 use GR\Telephponic\Trace\Integration\Curl;
 use GR\Telephponic\Trace\Integration\Grpc;
 use GR\Telephponic\Trace\Integration\Integration;
 use GR\Telephponic\Trace\Integration\Memcached;
+use GR\Telephponic\Trace\Integration\PDO;
 use GR\Telephponic\Trace\Integration\Redis;
+use GR\Telephponic\Trace\Stacktrace\PlainTextStacktraceProvider;
+use GR\Telephponic\Trace\Stacktrace\StacktraceProvider;
 use GR\Telephponic\Trace\Telephponic;
+use InvalidArgumentException;
 use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\Contrib\Zipkin\Exporter;
+use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
@@ -28,6 +31,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
@@ -36,6 +40,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use RuntimeException;
 
 class Builder
 {
@@ -46,8 +51,10 @@ class Builder
     private ?SpanExporterInterface $exporter = null;
     private bool $batchMode = false;
     private array $defaultAttributes = [];
-    private $registerShutdown = true;
+    private bool $registerShutdown = true;
+    private ?StacktraceProvider $stacktraceProvider = null;
     private array $integrations = [];
+    private TextMapPropagatorInterface $propagator;
 
     public function __construct(
         private readonly string $appName,
@@ -134,43 +141,23 @@ class Builder
     {
         return $this
             ->withTransport(PsrTransportFactory::discover()->create($url, 'application/json'))
-            ->withExporter(new Exporter($name, $this->transport))
+            ->withExporter(new ZipkinExporter($name, $this->transport))
         ;
     }
 
-    public function enableShutdownHandler(): self
-    {
-        $this->enableShutdownHandler = true;
-
-        return $this;
-    }
-
-    public function disableShutdownHandler(): self
-    {
-        $this->enableShutdownHandler = false;
-
-        return $this;
-    }
-
+    /** @throws RuntimeException */
     public function withDefaultSpanExporter(): self
     {
         if ($this->transport === null) {
-            throw new Exception('Transport not set'); // fixme Use a custom exception
+            throw new RuntimeException('Transport not set'); // fixme Use a custom exception
         }
 
-        return $this->withSpanExporter(new SpanExporter($this->transport));
-    }
-
-    private function withSpanExporter(SpanExporterInterface $spanExporter): self
-    {
-        $this->spanExporter = $spanExporter;
-
-        return $this;
+        return $this->withExporter(new SpanExporter($this->transport));
     }
 
     public function withInMemoryExporter(): self
     {
-        return $this->withSpanExporter(new InMemoryExporter());
+        return $this->withExporter(new InMemoryExporter());
     }
 
     public function withTraceContextPropagator(): self
@@ -200,7 +187,7 @@ class Builder
     public function build(): Telephponic
     {
         if ($this->exporter === null) {
-            throw new Exception('Exporter is not set'); // fixme Use a custom exception
+            throw new RuntimeException('Exporter is not set'); // fixme Use a custom exception
         }
 
         if ($this->resourceInfo === null) {
@@ -227,23 +214,32 @@ class Builder
             $tracer,
             $this->defaultAttributes,
             $this->registerShutdown,
+            $this->stacktraceProvider,
             ...$this->integrations,
         );
     }
 
-    public function withDefaultResource(): self
+    /**
+     * @param bool $enableAutoDiscover If true, Telephponic will add to all spans info retrieve from environment and server.
+     */
+    public function withDefaultResource(bool $enableAutoDiscover = false): self
     {
-        return $this->withResourceInfo(
-            ResourceInfoFactory::merge(
-                ResourceInfo::create(
-                    Attributes::create([
-                        ResourceAttributes::SERVICE_NAMESPACE => $this->namespace ?? $this->appName,
-                        ResourceAttributes::SERVICE_NAME => $this->appName,
-                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->environment,
-                    ])
-                ),
+        $resourceInfo = ResourceInfo::create(
+            Attributes::create([
+                ResourceAttributes::SERVICE_NAMESPACE => $this->namespace ?? $this->appName,
+                ResourceAttributes::SERVICE_NAME => $this->appName,
+                ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->environment,
+            ])
+        );
+        if ($enableAutoDiscover) {
+            $resourceInfo = ResourceInfoFactory::merge(
+                $resourceInfo,
                 ResourceInfoFactory::defaultResource(),
-            )
+            );
+        }
+
+        return $this->withResourceInfo(
+            $resourceInfo
         );
     }
 
@@ -283,7 +279,13 @@ class Builder
 
     public function withProbabilitySampler(float $probability): self
     {
-        return $this->withSampler(new TraceIdRatioBasedSampler($probability));
+        if ($probability < 0 || $probability > 1) {
+            throw new InvalidArgumentException(
+                sprintf('$probability must be between 0 and 1. You passed %s.', $probability)
+            );
+        }
+
+        return $this->withSampler(new ParentBased(new TraceIdRatioBasedSampler($probability)));
     }
 
     public function withNeverSampler(): self
@@ -291,9 +293,18 @@ class Builder
         return $this->withSampler(new AlwaysOffSampler());
     }
 
-    public function withCurlIntegration(): self
-    {
-        return $this->withIntegration(new Curl());
+    public function withCurlIntegration(
+        bool $traceCurlInit = true,
+        bool $traceCurlExec = true,
+        bool $traceCurlSetOpt = true,
+    ): self {
+        return $this->withIntegration(
+            new Curl(
+                $traceCurlInit,
+                $traceCurlExec,
+                $traceCurlSetOpt
+            )
+        );
     }
 
     public function withIntegration(Integration $integration): self
@@ -303,18 +314,117 @@ class Builder
         return $this;
     }
 
-    public function withGrpcIntegration(): self
-    {
-        return $this->withIntegration(new Grpc());
+    public function withGrpcIntegration(
+        bool $traceGrpcSimpleRequest = true,
+        bool $traceGrpcClientStreamRequest = true,
+        bool $traceGrpcServerStreamRequest = true,
+        bool $traceGrpcBidiRequest = true,
+    ): self {
+        return $this->withIntegration(
+            new Grpc(
+                $traceGrpcSimpleRequest,
+                $traceGrpcClientStreamRequest,
+                $traceGrpcServerStreamRequest,
+                $traceGrpcBidiRequest,
+            )
+        );
     }
 
-    public function withMemcachedIntegration(): self
-    {
-        return $this->withIntegration(new Memcached());
+    public function withMemcachedIntegration(
+        bool $traceAdd = true,
+        bool $traceDelete = true,
+        bool $traceDeleteMulti = true,
+        bool $traceGet = true,
+        bool $traceGetMulti = true,
+        bool $traceSet = true,
+        bool $traceSetMulti = true,
+    ): self {
+        return $this->withIntegration(
+            new Memcached(
+                $traceAdd,
+                $traceDelete,
+                $traceDeleteMulti,
+                $traceGet,
+                $traceGetMulti,
+                $traceSet,
+                $traceSetMulti,
+            )
+        );
     }
 
-    public function withRedisIntegration(): self
+    public function withRedisIntegration(
+        bool $traceConnect = true,
+        bool $traceOpen = true,
+        bool $tracePconnect = true,
+        bool $tracePopen = true,
+        bool $traceClose = true,
+        bool $tracePing = true,
+        bool $traceEcho = true,
+        bool $traceGet = true,
+        bool $traceSet = true,
+        bool $traceDel = true,
+        bool $traceDelete = true,
+        bool $traceUnlink = true,
+        bool $traceExists = true,
+    ): self {
+        return $this->withIntegration(
+            new Redis(
+                $traceConnect,
+                $traceOpen,
+                $tracePconnect,
+                $tracePopen,
+                $traceClose,
+                $tracePing,
+                $traceEcho,
+                $traceGet,
+                $traceSet,
+                $traceDel,
+                $traceDelete,
+                $traceUnlink,
+                $traceExists,
+            )
+        );
+    }
+
+    public function withPDOIntegration(
+        bool $tracePdoConnect = true,
+        bool $tracePdoQuery = true,
+        bool $tracePdoCommit = true,
+        bool $tracePdoStatementQuery = true,
+        bool $tracePdoStatementBindParam = true,
+    ): self {
+        return $this->withIntegration(
+            new PDO(
+                $tracePdoConnect,
+                $tracePdoQuery,
+                $tracePdoCommit,
+                $tracePdoStatementQuery,
+                $tracePdoStatementBindParam,
+            )
+        );
+    }
+
+    public function enableAddTraceAsAttribute(): self
     {
-        return $this->withIntegration(new Redis());
+        return $this->withPlainTextStacktraceProvider();
+    }
+
+    public function withPlainTextStacktraceProvider(): self
+    {
+        return $this->withStacktraceProvider(new PlainTextStacktraceProvider());
+    }
+
+    public function withStacktraceProvider(StacktraceProvider $stacktraceProvider): self
+    {
+        $this->stacktraceProvider = $stacktraceProvider;
+
+        return $this;
+    }
+
+    public function disableAddTraceAsAttribute(): self
+    {
+        $this->stacktraceProvider = null;
+
+        return $this;
     }
 }

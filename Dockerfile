@@ -1,12 +1,4 @@
-FROM php:8.2-fpm-bullseye AS dev
-
-RUN apt update && \
-    apt install -y git \
-    libz-dev \
-    libmemcached-dev
-
-RUN pecl install opentelemetry-beta grpc xdebug redis memcached &&  \
-    docker-php-ext-enable opentelemetry opcache grpc redis memcached
+FROM europe-west1-docker.pkg.dev/fc-shared/tech/php-cli-8.2-alpine-3.17:latest AS base
 
 RUN apt update && apt install -y  && pecl install  &&
 
