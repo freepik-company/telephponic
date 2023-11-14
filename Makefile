@@ -32,3 +32,9 @@ composer-why: ## Show why a package is installed
 
 run-example: ## Run the project
 	@docker compose exec app php $(filter-out $@,$(MAKECMDGOALS))
+
+test: ## Run the tests
+	@docker run --rm --tty --user "${UID}":"${GID}" -v "${PWD}":/app -w /app dev-telephonic:dev php vendor/bin/phpunit --colors=always --no-coverage --stop-on-failure
+
+test-coverage: ## Run the tests with coverage
+	@docker run --rm --tty --user "${UID}":"${GID}" -e "XDEBUG_MODE=coverage" -v "${PWD}":/app -w /app dev-telephonic:dev php vendor/bin/phpunit --colors=always --stop-on-failure

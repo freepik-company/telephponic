@@ -8,6 +8,11 @@
       "GR\\Telephponic\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "GR\\Telephponic\\Test\\": "test/"
+    }
+  },
   "authors": [
     {
       "name": "José A. Muriano",
@@ -18,21 +23,22 @@
   "require": {
     "php": "^8.0.0",
     "ext-grpc": "*",
-    "ext-pdo": "*",
     "ext-memcached": "*",
+    "ext-pdo": "*",
     "ext-redis": "*",
+    "google/cloud-trace": "^1.6",
+    "google/protobuf": "^v3.3.0",
+    "grpc/grpc": "^1.52",
+    "guzzlehttp/promises": "^2.0",
+    "nyholm/psr7": "^1.8",
     "open-telemetry/api": "@stable",
+    "open-telemetry/exporter-otlp": "@stable",
+    "open-telemetry/exporter-zipkin": "^0.0.17",
     "open-telemetry/sdk": "@stable",
     "open-telemetry/transport-grpc": "@stable",
-    "open-telemetry/exporter-otlp": "@stable",
-    "grpc/grpc": "^1.52",
-    "symfony/http-client": "^6.3",
-    "nyholm/psr7": "^1.8",
-    "guzzlehttp/promises": "^2.0",
     "php-http/httplug": "^2.4",
-    "google/protobuf": "^v3.3.0",
-    "google/cloud-trace": "^1.6",
-    "open-telemetry/exporter-zipkin": "^0.0.17"
+    "psr/log": "^3.0",
+    "symfony/http-client": "^6.3"
   },
   "config": {
     "allow-plugins": {
@@ -46,6 +52,7 @@
     "ext-ffi": "Fiber-based context storage"
   },
   "require-dev": {
-    "symfony/var-dumper": "^6.3"
+    "symfony/var-dumper": "^6.3",
+    "phpunit/phpunit": "^10.4"
   }
 }

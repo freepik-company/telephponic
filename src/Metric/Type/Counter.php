@@ -6,25 +6,15 @@ namespace GR\Telephponic\Metric\Type;
 
 use GR\Telephponic\Metric\ValueObject\Type;
 use GR\Telephponic\Metric\ValueObject\Unit;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
 
-class Histogram implements Metric
+class Counter implements Metric
 {
-    private array $values = [];
-    private ClockInterface $clock;
-
     public function __construct(
         private string $name,
-        private Unit $unit,
+        protected int|float $value = 0.0,
+        private Unit $unit = Unit::Count,
         private ?string $description = null,
     ) {
-        $this->clock = (new ClockFactory())->build();
-    }
-
-    public function record(int|float $value): void
-    {
-        $this->values[$this->clock->now()] = $value;
     }
 
     public function normalize(): array
@@ -32,7 +22,7 @@ class Histogram implements Metric
         return [
             'type' => $this->type()->value,
             'name' => $this->name,
-            'values' => $this->values,
+            'value' => $this->value,
             'unit' => $this->unit->value,
             'description' => $this->description,
         ];
@@ -40,12 +30,27 @@ class Histogram implements Metric
 
     public function type(): Type
     {
-        return Type::Histogram;
+        return Type::Counter;
+    }
+
+    public function record(float|int $value): void
+    {
+        $this->increment($value);
+    }
+
+    public function increment(int|float $quantity = 1.0): void
+    {
+        $this->value += $quantity;
     }
 
     public function name(): string
     {
         return $this->name;
+    }
+
+    public function value(): float|int
+    {
+        return $this->value;
     }
 
     public function unit(): Unit
