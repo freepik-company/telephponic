@@ -23,9 +23,6 @@
   "require": {
     "php": "^8.1",
     "ext-grpc": "*",
-    "ext-memcached": "*",
-    "ext-pdo": "*",
-    "ext-redis": "*",
     "google/cloud-trace": "^1.6",
     "google/protobuf": "^v3.3.0",
     "grpc/grpc": "^1.52",
