@@ -1,0 +1,19 @@
+version: 2
+registries:
+  composer:
+    type: composer-repository
+    url: https://freepik-company.repo.repman.cdnpk.net
+    username: token
+    password: ${{secrets.DEPENDABOT_REPMAN_ACCESS_TOKEN}}
+updates:
+  - package-ecosystem: "composer" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    registries: "*"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - Muriano
+      - kerunaru
+    reviewers:
+      - freepik-company/backend
+    open-pull-requests-limit: 25
