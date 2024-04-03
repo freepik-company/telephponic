@@ -21,7 +21,7 @@
   ],
   "minimum-stability": "beta",
   "require": {
-    "php": "^8.1",
+    "php": "^8.3",
     "ext-grpc": "*",
     "google/cloud-trace": "^1.6",
     "google/protobuf": "^v3.3.0",
