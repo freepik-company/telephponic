@@ -45,3 +45,19 @@ up: ## Start the project
 
 down: ## Stop the project
 	@docker compose down
+
+# RELEASES -------------------------------------------------------------------------------------------------------------
+.ONESHELL:
+release: release-start release-finish ## Generate Changelog file and new version tag and upload it to the server
+
+release-start:
+	@cz ch --dry-run
+	@cz bump --dry-run
+	@echo "Confirmation required:"
+	@echo "If above info is correct press any key to continue. If not, press CTRL+C to stop publishing a release"
+	@read none
+	@cz bump --changelog -at
+
+release-finish:
+	@echo "Uploading release to git origin"
+	@git push --no-verify && git push --tags --no-verify
