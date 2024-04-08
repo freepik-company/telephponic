@@ -35,7 +35,7 @@
     "open-telemetry/transport-grpc": "@stable",
     "php-http/httplug": "^2.4",
     "psr/log": "^3.0",
-    "symfony/http-client": "^6.3"
+    "symfony/http-client": "^6.3 || ^7.0"
   },
   "config": {
     "allow-plugins": {
