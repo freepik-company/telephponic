@@ -1,3 +1,9 @@
+## 4.0.1 (2024-04-11)
+
+### Fix
+
+- **CHECKOUT-XXX**: Fix optional parameter in traceset redis
+
 ## 4.0.0 (2024-04-03)
 
 ### Feat
