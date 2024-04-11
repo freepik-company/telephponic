@@ -1,3 +1,9 @@
+## 4.0.2 (2024-04-11)
+
+### Fix
+
+- **CHECKOUT-XXX**: Change redis integration for del
+
 ## 4.0.1 (2024-04-11)
 
 ### Fix
