@@ -86,7 +86,7 @@ class Redis extends AbstractIntegration
         );
     }
 
-    public function traceSet(\Redis $redis, string $key, string $value, mixed $options): array
+    public function traceSet(\Redis $redis, string $key, mixed $value, mixed $options = null): array
     {
         $params = [
             'redis.instance' => spl_object_hash($redis),
