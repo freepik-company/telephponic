@@ -106,13 +106,14 @@ class Redis extends AbstractIntegration
         );
     }
 
-    public function traceDel(\Redis $redis, string ...$keys): array
+    public function traceDel(\Redis $redis, array|string $key, string ...$other_keys): array
     {
         return $this->generateTraceParams(
             'redis/del',
             [
                 'redis.instance' => spl_object_hash($redis),
-                'redis.keys' => $this->convertToValue($keys),
+                'redis.keys' => $this->convertToValue($key),
+                'redis.otherKeys' => $this->convertToValue($other_keys),
             ]
         );
     }
