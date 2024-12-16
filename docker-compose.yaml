@@ -28,7 +28,7 @@ services:
     entrypoint: [ 'php', '-S', '0.0.0.0:8080', '-t', '/app/examples' ]
     volumes:
       - .:/app
-      - /Users/jamuriano/.config/gcloud/application_default_credentials.json:/application_default_credentials.json
+      - ${HOME}/.config/gcloud/application_default_credentials.json:/application_default_credentials.json
     working_dir: /app/examples
     ports:
       - "8080:8080"

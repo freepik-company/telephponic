@@ -14,7 +14,7 @@ use GR\Telephponic\Trace\Stacktrace\PlainTextStacktraceProvider;
 use GR\Telephponic\Trace\Stacktrace\StacktraceProvider;
 use GR\Telephponic\Trace\Telephponic;
 use InvalidArgumentException;
-use OpenTelemetry\API\Common\Signal\Signals;
+use OpenTelemetry\API\Signals;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
@@ -24,9 +24,8 @@ use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
-use OpenTelemetry\SDK\Common\Time\SystemClock;
+use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
@@ -139,10 +138,17 @@ class Builder
 
     public function forZipkinExportation(string $url, string $name = 'telephponic'): self
     {
+        $mergeAttributeName = ResourceInfo::create(
+            Attributes::create([
+                ResourceAttributes::SERVICE_NAME => $name,
+            ])
+        );
+        $currentResource = ResourceInfoFactory::defaultResource();
+        $mergedResource = $currentResource->merge($mergeAttributeName);
         return $this
             ->withTransport(PsrTransportFactory::discover()->create($url, 'application/json'))
-            ->withExporter(new ZipkinExporter($name, $this->transport))
-        ;
+            ->withExporter(new ZipkinExporter($this->transport))
+            ->withResourceInfo($mergedResource);
     }
 
     /** @throws RuntimeException */
@@ -174,7 +180,8 @@ class Builder
 
     public function withSystemClock(): self
     {
-        return $this->withClock(SystemClock::create());
+        Clock::reset();
+        return $this->withClock(Clock::getDefault());
     }
 
     public function withClock(ClockInterface $clock): self
@@ -252,7 +259,7 @@ class Builder
 
     public function withDefaultClock(): self
     {
-        return $this->withClock(ClockFactory::getDefault());
+        return $this->withClock(Clock::getDefault());
     }
 
     public function withAlwaysOnSampler(): self
