@@ -30,7 +30,7 @@
     "nyholm/psr7": "^1.8",
     "open-telemetry/api": "@stable",
     "open-telemetry/exporter-otlp": "@stable",
-    "open-telemetry/exporter-zipkin": "^0.0.17",
+    "open-telemetry/exporter-zipkin": "^1.1.0",
     "open-telemetry/sdk": "@stable",
     "open-telemetry/transport-grpc": "@stable",
     "php-http/httplug": "^2.4",

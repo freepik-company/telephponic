@@ -6,8 +6,8 @@ namespace GR\Telephponic\Metric\Type;
 
 use GR\Telephponic\Metric\ValueObject\Type;
 use GR\Telephponic\Metric\ValueObject\Unit;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\API\Common\Time\Clock;
+Use OpenTelemetry\API\Common\Time\ClockInterface;
 
 class Histogram implements Metric
 {
@@ -19,7 +19,7 @@ class Histogram implements Metric
         private Unit $unit,
         private ?string $description = null,
     ) {
-        $this->clock = (new ClockFactory())->build();
+        $this->clock = Clock::getDefault();
     }
 
     public function record(int|float $value): void
