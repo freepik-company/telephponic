@@ -138,10 +138,17 @@ class Builder
 
     public function forZipkinExportation(string $url, string $name = 'telephponic'): self
     {
+        $mergeAttributeName = ResourceInfo::create(
+            Attributes::create([
+                ResourceAttributes::SERVICE_NAME => $name,
+            ])
+        );
+        $currentResource = ResourceInfoFactory::defaultResource();
+        $mergedResource = $currentResource->merge($mergeAttributeName);
         return $this
             ->withTransport(PsrTransportFactory::discover()->create($url, 'application/json'))
             ->withExporter(new ZipkinExporter($this->transport))
-        ;
+            ->withResourceInfo($mergedResource);
     }
 
     /** @throws RuntimeException */
