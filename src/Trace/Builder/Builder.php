@@ -239,10 +239,8 @@ class Builder
             ])
         );
         if ($enableAutoDiscover) {
-            $resourceInfo = ResourceInfoFactory::merge(
-                $resourceInfo,
-                ResourceInfoFactory::defaultResource(),
-            );
+            $currentResource = ResourceInfoFactory::defaultResource();
+            $resourceInfo = $currentResource->merge($resourceInfo);
         }
 
         return $this->withResourceInfo(
