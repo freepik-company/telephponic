@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6b2e11d20bf4f58b5ae907645eda4f55",
+    "content-hash": "063663bccc9565ea2d59ac41e20f8b12",
     "packages": [
         {
             "name": "brick/math",
@@ -602,16 +602,16 @@
         },
         {
             "name": "google/protobuf",
-            "version": "v3.25.5",
+            "version": "v4.29.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/protocolbuffers/protobuf-php.git",
-                "reference": "dd2cf3f7b577dced3851c2ea76c3daa9f8aa0ff4"
+                "reference": "79aa5014efeeec3d137df5cdb0ae2fc163953945"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/dd2cf3f7b577dced3851c2ea76c3daa9f8aa0ff4",
-                "reference": "dd2cf3f7b577dced3851c2ea76c3daa9f8aa0ff4",
+                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/79aa5014efeeec3d137df5cdb0ae2fc163953945",
+                "reference": "79aa5014efeeec3d137df5cdb0ae2fc163953945",
                 "shasum": ""
             },
             "require": {
@@ -640,9 +640,9 @@
                 "proto"
             ],
             "support": {
-                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v3.25.5"
+                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v4.29.2"
             },
-            "time": "2024-09-18T22:04:15+00:00"
+            "time": "2024-12-18T14:11:12+00:00"
         },
         {
             "name": "grpc/grpc",
@@ -4832,6 +4832,6 @@
         "php": "^8.3",
         "ext-grpc": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
