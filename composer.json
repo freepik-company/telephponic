@@ -24,7 +24,7 @@
     "php": "^8.3",
     "ext-grpc": "*",
     "google/cloud-trace": "^1.6",
-    "google/protobuf": "^v3.3.0",
+    "google/protobuf": "^v3.3.0 || ^4.0.0",
     "grpc/grpc": "^1.52",
     "guzzlehttp/promises": "^2.0",
     "nyholm/psr7": "^1.8",
