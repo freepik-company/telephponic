@@ -24,7 +24,7 @@
     "php": "^8.3",
     "ext-grpc": "*",
     "google/cloud-trace": "^1.6",
-    "google/protobuf": "^v3.3.0",
+    "google/protobuf": "^4.26",
     "grpc/grpc": "^1.52",
     "guzzlehttp/promises": "^2.0",
     "nyholm/psr7": "^1.8",
@@ -39,7 +39,8 @@
   },
   "config": {
     "allow-plugins": {
-      "php-http/discovery": true
+      "php-http/discovery": true,
+      "tbachert/spi": true
     }
   },
   "suggest": {
@@ -54,6 +55,6 @@
   },
   "require-dev": {
     "symfony/var-dumper": "^6.3 || ^7.0",
-    "phpunit/phpunit": "^10.4"
+    "phpunit/phpunit": "^10.5.62"
   }
 }
