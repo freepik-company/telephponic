@@ -18,6 +18,9 @@ build: ## Build the project
 	@docker build -t $(DOCKER_IMAGE) --target base .
 	@$(MAKE) composer-install
 
+composer-audit:
+	@docker run --rm --user "${UID}":"${GID}" -v "${PWD}":/app -w /app $(DOCKER_IMAGE) composer audit
+
 composer-install: ## Install composer dependencies
 	@docker run --rm --user "${UID}":"${GID}" -v "${PWD}":/app -w /app $(DOCKER_IMAGE) composer install
 
