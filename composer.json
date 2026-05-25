@@ -23,7 +23,7 @@
   "require": {
     "php": "^8.3",
     "ext-grpc": "*",
-    "google/cloud-trace": "^1.6",
+    "google/cloud-trace": "^1.6 || ^2.0",
     "google/protobuf": "^4.26",
     "grpc/grpc": "^1.52",
     "guzzlehttp/promises": "^2.0",
