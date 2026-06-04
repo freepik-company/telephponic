@@ -37,6 +37,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use RuntimeException;
@@ -49,6 +50,7 @@ class Builder
     private ?ClockInterface $clock = null;
     private ?SpanExporterInterface $exporter = null;
     private bool $batchMode = false;
+    private array $additionalSpanProcessors = [];
     private array $defaultAttributes = [];
     private bool $registerShutdown = true;
     private ?StacktraceProvider $stacktraceProvider = null;
@@ -210,9 +212,12 @@ class Builder
         }
 
         $tracer = new TracerProvider(
-            $this->batchMode
-                ? $this->createBatchSpanProcessor()
-                : $this->createSimpleSpanProcessor(),
+            [
+                $this->batchMode
+                    ? $this->createBatchSpanProcessor()
+                    : $this->createSimpleSpanProcessor(),
+                ...$this->additionalSpanProcessors,
+            ],
             $this->sampler,
             $this->resourceInfo,
         );
@@ -315,6 +320,13 @@ class Builder
     public function withIntegration(Integration $integration): self
     {
         $this->integrations[] = $integration;
+
+        return $this;
+    }
+
+    public function withSpanProcessor(SpanProcessorInterface $processor): self
+    {
+        $this->additionalSpanProcessors[] = $processor;
 
         return $this;
     }
