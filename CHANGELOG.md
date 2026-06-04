@@ -1,3 +1,9 @@
+## 5.1.0 (2026-06-04)
+
+### Feat
+
+- **SpanProcessor**: Custom span processor (#196)
+
 ## 5.0.2 (2026-05-21)
 
 ### Fix
