@@ -15,6 +15,9 @@ final class SpanProcessorSpy implements SpanProcessorInterface
     /** @var array<array{name: string, startNanos: int}> */
     public array $starts = [];
 
+    /** @var array<array{name: string, endNanos: int}> */
+    public array $ends = [];
+
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
         $this->starts[] = [
@@ -25,6 +28,10 @@ final class SpanProcessorSpy implements SpanProcessorInterface
 
     public function onEnd(ReadableSpanInterface $span): void
     {
+        $this->ends[] = [
+            'name'     => $span->getName(),
+            'endNanos' => $span->toSpanData()->getEndEpochNanos(),
+        ];
     }
 
     public function shutdown(?CancellationInterface $cancellation = null): bool
