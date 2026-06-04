@@ -43,16 +43,20 @@ class Telephponic
         $this->addIntegrations(...$integrations);
     }
 
-    public function start(string $name, array $attributes = []): void
+    public function start(string $name, array $attributes = [], ?int $startTimestampNanos = null): void
     {
-        $span = $this->createSpan($name);
+        $span = $this->createSpan($name, $startTimestampNanos);
         $span->setAttributes($this->defaultAttributes + $attributes);
         $this->saveSpan($span);
     }
 
-    private function createSpan(string $name): SpanInterface
+    private function createSpan(string $name, ?int $startTimestampNanos = null): SpanInterface
     {
-        return $this->tracer->spanBuilder($name)->startSpan();
+        $builder = $this->tracer->spanBuilder($name);
+        if ($startTimestampNanos !== null) {
+            $builder->setStartTimestamp($startTimestampNanos);
+        }
+        return $builder->startSpan();
     }
 
     private function saveSpan(SpanInterface $span): void
