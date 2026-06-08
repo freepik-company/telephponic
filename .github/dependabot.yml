@@ -12,7 +12,6 @@ updates:
     schedule:
       interval: "weekly"
     assignees:
-      - Muriano
       - kerunaru
     reviewers:
       - freepik-company/backend
